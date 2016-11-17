@@ -29,7 +29,7 @@ robot  = struct('pose', [9;-9; 3*pi/4] ,'param',[5; 2; 2], 'size', [1.5, 1], 'la
 %initializing MLP
 
 %architecture and parameters    
-mlpParam  = struct('moment', 0.5 ,'alpha', 0.5, 'eta', 0.2, 'epoch', 1000);
+mlpParam  = struct('moment', 0.5 ,'alpha', 0.5, 'eta', 0.05, 'epoch', 1000);
 mlpArch = struct('inputs', sensor_num + 2, 'hidden1', 25, 'hidden2', 25, 'outputs', 2);
 %weights init
 wIn1Init = -0.1 + (0.1+0.1)*rand(mlpArch.inputs+1,mlpArch.hidden1);

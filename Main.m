@@ -82,7 +82,7 @@ ylabel('MSE');
 %% running with perceptron for different route
 maze = GenerateMaze('maze.xlsx');
 
-robot  = struct('pose', [9; -9; 3*pi/4] ,'param',[5; 2; 2], 'size', [1.5, 1], 'laserAngles', -sensor_ang:2*sensor_ang/(sensor_num - 1):sensor_ang, 'goal',[-6.25;6.6]);
+robot  = struct('pose', [7; -8; 3*pi/4] ,'param',[5; 2; 2], 'size', [1.5, 1], 'laserAngles', -sensor_ang:2*sensor_ang/(sensor_num - 1):sensor_ang, 'goal',[-6.25;6.6]);
 poseHist = [];
 laserHist = [];
 velHist = [];
