@@ -37,7 +37,7 @@
 %     
    a = robot.size(1);  % robot length
            b = robot.size(2); 
-[hist, lHist, gHist, vel, collision, goal] = Drive(robot, 0.1, [1; 1], maze, Ts);
+[hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 1], maze, Ts);
 HistoryUpdate;
     
     while(~collision && ~goal)
@@ -61,46 +61,46 @@ HistoryUpdate;
         if laserHist(4,end) < 3 || laserHist(5,end)<2.6  
            
             
-            [hist, lHist, gHist, vel, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
+            [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
              HistoryUpdate;
         
         elseif laserHist(4,end) < 3 || laserHist(3,end)<2.6
                
            
             
-             [hist, lHist, gHist, vel, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
+             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
              HistoryUpdate;        
             
              
         elseif laserHist(4,end) < 3 || laserHist(6,end)<2.3
-             [hist, lHist, gHist, vel, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
+             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
              HistoryUpdate;
         elseif laserHist(4,end) < 3 || laserHist(2,end)<2.3
-             [hist, lHist, gHist, vel, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
+             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
              HistoryUpdate;      
              
              
         elseif laserHist(4,end) < 3 || laserHist(7,end)<2.1
-             [hist, lHist, gHist, vel, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
+             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
              HistoryUpdate;
              
         elseif laserHist(4,end) < 3 || laserHist(1,end)<2.1
-             [hist, lHist, gHist, vel, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
+             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
              HistoryUpdate;
      
     
         
         else      
              if     atan2(robot.goal(2) - yPose, robot.goal(1) - xPose) <robot.pose(3)+robot.laserAngles(4)
-             [hist, lHist, gHist, vel, collision, goal] = Drive(robot, 0.1, [1;0], maze, Ts);
+             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1;0], maze, Ts);
              HistoryUpdate;
             
         elseif   atan2(robot.goal(2) - yPose, robot.goal(1) - xPose) >robot.pose(3)+robot.laserAngles(4)
-                       [hist, lHist, gHist, vel, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
+                       [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
              HistoryUpdate;
              
              elseif (atan2(robot.goal(2) - yPose, robot.goal(1) - xPose) ==robot.pose(3)+robot.laserAngles(4))
-            [hist, lHist, gHist, vel, collision, goal] = Drive(robot, 0.1, [1; 1], maze, Ts);
+            [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 1], maze, Ts);
              HistoryUpdate;   
              
              
