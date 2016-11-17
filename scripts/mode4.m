@@ -91,15 +91,15 @@ HistoryUpdate;
     
         
         else      
-             if     atan2(robot.goal(2) - yPose, robot.goal(1) - xPose) <robot.pose(3)+robot.laserAngles(4)
+             if     atan2(robot.goal(2) - yPose, robot.goal(1) - xPose) <robot.pose(3)
              [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1;0], maze, Ts);
              HistoryUpdate;
             
-        elseif   atan2(robot.goal(2) - yPose, robot.goal(1) - xPose) >robot.pose(3)+robot.laserAngles(4)
+        elseif   atan2(robot.goal(2) - yPose, robot.goal(1) - xPose) >robot.pose(3)
                        [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
              HistoryUpdate;
              
-             elseif (atan2(robot.goal(2) - yPose, robot.goal(1) - xPose) ==robot.pose(3)+robot.laserAngles(4))
+             elseif atan2(robot.goal(2) - yPose, robot.goal(1) - xPose)==robot.pose(3)
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 1], maze, Ts);
              HistoryUpdate;   
              

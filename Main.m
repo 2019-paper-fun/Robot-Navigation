@@ -45,7 +45,7 @@ if mode==4
     mode4;
 end
 
-%Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
+Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
 %%
 %training the perceptron
 
@@ -80,7 +80,7 @@ xlabel('Epochs');
 ylabel('MSE');
 
 %% running with perceptron for different route
-maze = GenerateMaze('maze.xlsx');
+maze = GenerateMaze('maze6.xlsx');
 
 robot  = struct('pose', [7; -8; 3*pi/4] ,'param',[5; 2; 2], 'size', [1.5, 1], 'laserAngles', -sensor_ang:2*sensor_ang/(sensor_num - 1):sensor_ang, 'goal',[-6.25;6.6]);
 poseHist = [];
