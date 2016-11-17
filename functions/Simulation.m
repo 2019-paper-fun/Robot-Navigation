@@ -65,9 +65,9 @@ for t=1:1/(Ts*10):length(pose)
     text(-9.8,12.4,['X: ' num2str(pose(1,t))]);
     text(-9.8,11.4,['Y: ' num2str(pose(2,t))]);
     text(-4.8,13.4,'Laser readings');
-    text(-4.8,12.4,['Left: ' num2str(laserHist(2,t))]);
+    text(-4.8,12.4,['Left: ' num2str(laserHist(6,t))]);
     text(-4.8,11.4,['Center: ' num2str(laserHist(4,t))]);
-    text(1.8,12.4,['Right: ' num2str(laserHist(6,t))]);
+    text(1.8,12.4,['Right: ' num2str(laserHist(2,t))]);
     text(1.8,11.4,['Goal: ' num2str(gtHist(2,t))]);
     hold off;
 
