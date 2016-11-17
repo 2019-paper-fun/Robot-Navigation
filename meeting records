@@ -69,21 +69,29 @@
 					® 단점
 						◊ 환경설정 까다로움
 						◊ Lstm 소스가 비공식
+					® RNN 코드에 문제가 생기거나 일찍 끝나면 진행
 				□ 일단 RNN으로 갑시다
 			§ Github 사용
-				□ https://opentutorials.org/course/1
+				□ 동영상 강의 참고: https://opentutorials.org/course/1
+				1) Git, Source Tree 받아서 설치
+				2) Github invitation accept
+				3) Commit: 코드 수정후 Version 만들기
+				4) Pull: 수정한 Version을 github에 올리기
+				5) Branch: 실험용 코드를 Master 코드와 따로 진행할때
 		○ 해야할일
+			§ 모두가
+				□ 주석 달기, 변수이름 직관적으로
+				□ Github 사용!
 			§ 권오철씨
 				□ Training data data는 파일로 저장 필요
 				□ Maze도 파일로 저장
 				□ 골과 출발위치를 랜덤으로 설정 (알고리즘 필요)
-				□ 주석달기
 				□ Training data는 부딪히지 않고 골에 도착한 경우만 저장
 			§ 홍찬솔씨
 				□ (빨리) 레이저 절대각도 -> 상대각도
+				□ RNN 코드 Github에 올려주세요
+				□ RNN을 시뮬레이터에 적용
 				□ Training 후 model parameter를 파일로 저장해서 나중에 불러올수 있도록
 			§ 고병수
-				
-				
-				
-			
+				□ RNN을 시뮬레이터에 적용
+				□ 권오철씨 코드 검토, 주석
