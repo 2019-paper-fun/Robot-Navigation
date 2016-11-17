@@ -80,12 +80,16 @@ while(dist>0 && ~collision && ~goal)
     
     laserHist = [laserHist bestLaserMeas];
     velHist = [velHist vel];
-    gtHist = [gtHist [laserPoseGoal(3); bestLaserMeas(end) == sqrt((laserPose(1,end)-robot.goal(1))^2 + (laserPose(2,end)-robot.goal(2))^2)]];
+    relativeAngle = laserPoseGoal(3) - robot.pose(3); %To be consistant with other laser angles -> +: goal is on left, -: goal is on right
+    if relativeAngle > pi
+        relativeAngle = relativeAngle - 2*pi;
+    end
+    gtHist = [gtHist [relativeAngle; bestLaserMeas(end) == sqrt((laserPose(1,end)-robot.goal(1))^2 + (laserPose(2,end)-robot.goal(2))^2)]];
     
     % STOPING CRITERION
     
     % goal is met when the goal is within 0.5 distance away from the sensor
-    if bestLaserMeas(end) < 0.6
+    if sqrt((laserPose(1,end)-robot.goal(1))^2 + (laserPose(2,end)-robot.goal(2))^2) < 0.6
         goal = 1;
     end
 % if(   abs(xPose-robot.goal(1))<0.6&&    abs( yPose-robot.goal(2))<0.6);

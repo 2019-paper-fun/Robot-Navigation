@@ -3,7 +3,7 @@ function [ new_pose ] = KinUpdate(pose, robotpar, ts, wheelspeed)
 %   pose            current pose [x, y, theta]
 %   robotpar        [ wheelseparation, radius right wheel, radius left wheel ]
 %   ts              sample time
-%   wheelspeed      [angular velocity right wheel, angular velocity left wheel ]                
+%   wheelspeed      [angular velocity LEFT wheel, angular velocity RIGHT wheel ]                
 
 %Extracting values
 x=pose(1); y=pose(2); theta=pose(3);
