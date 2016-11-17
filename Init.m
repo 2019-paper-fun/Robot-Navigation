@@ -100,4 +100,3 @@ Ts = 0.01;
 [hist, lHist, gHist] = InitialLaserRead(robot, maze);
 vel = [0;0]; %Robot is always initially halt
 HistoryUpdate;
-%test for github
