@@ -14,73 +14,62 @@
 
 clc;
 clear all;
- d = dir('mazeLib/*.xlsx');
- H=size(d,1);
-for W=1:H
 
-close all;    
-%initialization
-Init;
+%Define strategies
+strategies = {'StaticRoute' 'TunnelDrive' 'WallFollow' 'mode4'};
+%StaticRoute: driving static route
+%TunnelDrive: simple algorithm - tunnel driving
+%WallFollow: simple algorithm - following LEFT wall
+%mode4: what about making a good name?
 
-% make subsection
+%Fetch the maze files
+maze_files = dir('mazeLib/*.xlsx');
+num_of_maze=size(maze_files,1);
 
-%driving static route
-if mode == 1
-    j = 3;
-    StaticRoute;    
-
-end
-
-%simple algorithm - tunnel driving
-if mode==2   
-    TunnelDrive;
-end
-
-%simple algorithm - following right wall
-if mode==3     
-    WallFollow;
-end
-
-if mode==4     
-    mode4;
-end
-
-Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
-%%
-%training the perceptron
-
-dataPer1{W} = {[laserHist(1:end-1,:); gtHist(:,:)] velHist};
-%save dataPer{H}
-end
-for B=1:H
+%Iterate through maze files to get multiple dataset
+for ii=1:num_of_maze
+    close all;
+    %initialization
+    Init;
     
-    if B==1
-dataPer=dataPer1{1};
+    %generate maze
+    clear maze
+    maze = GenerateMaze(maze_files(ii).name);
     
+    %Record the initial laser readings
+    [hist, lHist, gHist] = InitialLaserRead(robot, maze);
+    vel = [0;0]; %Robot is always initially halt
+    HistoryUpdate;
     
-    else
-        
-      C=[dataPer{1,1}(:,:)      dataPer1{1,B}{1,1}(:,:)     ];
-        
-        D=[dataPer{1,2}(:,:)     dataPer1{1,B}{1,2}(:,:)       ];
-          clear dataPer
-          dataPer={C D};
-          
-        clear C;
-        clear D;
-    end
+    %Run the selected strategy
+    run(strategies{mode});
+    
+    %     Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
+    
+    dataPer_list{ii} = {[laserHist(1:end-1,:); gtHist(:,:)] velHist};
 end
 
+% Save the dataset as a mat file
+% save dataset.mat dataPer_list
+
+%% Concatenate All Dataset - Only for MLP, not RNN
+dataPer = cell(1,2);
+for ii=1:size(dataPer_list,2)
+    dataPer{1} = [dataPer{1} dataPer_list{ii}{1}];
+    dataPer{2} = [dataPer{2} dataPer_list{ii}{2}];
+end
+
+%% Train the network
 [wIn, wHid, wOut, MSEav3] = MlpTrain(dataPer, wIn1Init, w12Init, w2OutInit, mlpParam);
 
 figure(2);
-plot(MSEav3);   
+plot(MSEav3);
 title('Learning curve');
 xlabel('Epochs');
 ylabel('MSE');
 
-%% running with perceptron for different route
-maze = GenerateMaze('maze6.xlsx');
+%% Test the trained network
+maze = GenerateMaze('maze.xlsx');
 
 robot  = struct('pose', [7; -8; 3*pi/4] ,'param',[5; 2; 2], 'size', [1.5, 1], 'laserAngles', -sensor_ang:2*sensor_ang/(sensor_num - 1):sensor_ang, 'goal',[-6.25;6.6]);
 poseHist = [];
@@ -90,7 +79,6 @@ gtHist = [];
 collision = 0;
 goal = 0;
 
-
 [hist, lHist, gHist] = InitialLaserRead(robot, maze);
 vel = [0;0]; %Robot is always initially halt
 HistoryUpdate;
@@ -99,7 +87,7 @@ check = 0;
 while(~collision && ~goal)
     disp('Step: ')
     disp(check)
-     disp(hist )
+    disp(hist )
     check = check + 1;
     vOut = MlpRun([laserHist(1:end-1,end); gtHist(:,end)], wIn, wHid, wOut, mlpParam);
     v = round(vOut);
@@ -114,7 +102,7 @@ while(~collision && ~goal)
     
     [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, v, maze, Ts);
     HistoryUpdate;
-     
+    
 end
 
 %Simulation of the route

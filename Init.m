@@ -41,7 +41,6 @@ laserHist = [];
 velHist = [];
 gtHist = [];
 
-clear maze
 % z=8;
 % h=10;
 % K=randi([-7,7], 2,z);
@@ -60,8 +59,7 @@ clear maze
 % maze{z+1}=w;
 
 
-%generating maze
-maze = GenerateMaze(d(W).name);
+
 
 %initializing route history
 
@@ -95,8 +93,3 @@ collision = 0;
 goal = 0;
 mode = 4;
 Ts = 0.01;
-
-%Record the initial laser readings
-[hist, lHist, gHist] = InitialLaserRead(robot, maze);
-vel = [0;0]; %Robot is always initially halt
-HistoryUpdate;
