@@ -1,4 +1,4 @@
-function [poseHist, laserHist, velHist, gtHist, collision, goal] = Drive(robot, dist, vel, maze, ts)
+function [poseHist, laserHist, velHist, gtHist, collision, goal] = Drive(robot, dist, vel, maze, ts, is_test)
 %DRIVE Driving the robot forward
 %   Inputs:
 %       - robot: robot structure
@@ -6,8 +6,13 @@ function [poseHist, laserHist, velHist, gtHist, collision, goal] = Drive(robot, 
 %       - vel: velocity of the robot [2x1]
 %       - maze: maze coordinates {[2xn]xm}
 %       - Ts: sampling time [1x1]
+%       - is_test: if test, 1. 0 otherwise.
 %
 % Always use 'HistoryUpdate' script after running this function
+
+if nargin < 6
+    is_test = 0;
+end
 
 maxLaserRange = 30;
 poseHist = [];
@@ -20,7 +25,6 @@ collision = 0;
 goal = 0;
 
 while(dist>0 && ~collision && ~goal)
-    
     % POSITION UPDATE AND POSITION HISTORY
     
     % update position
@@ -83,21 +87,28 @@ while(dist>0 && ~collision && ~goal)
     relativeAngle = laserPoseGoal(3) - robot.pose(3); %To be consistant with other laser angles -> +: goal is on left, -: goal is on right
     if relativeAngle > pi
         relativeAngle = relativeAngle - 2*pi;
+    else if relativeAngle < pi
+            relativeAngle = relativeAngle + 2*pi;
     end
     gtHist = [gtHist [relativeAngle; bestLaserMeas(end) == sqrt((laserPose(1,end)-robot.goal(1))^2 + (laserPose(2,end)-robot.goal(2))^2)]];
     
     % STOPING CRITERION
     
-    % goal is met when the goal is within 0.5 distance away from the sensor
-    if sqrt((laserPose(1,end)-robot.goal(1))^2 + (laserPose(2,end)-robot.goal(2))^2) < 0.6
-        goal = 1;
+    % goal is met when the goal is within robot.goal(3) distance away from the sensor
+    dis_to_goal = sqrt((laserPose(1,end)-robot.goal(1))^2 + (laserPose(2,end)-robot.goal(2))^2);
+    if is_test
+        if dis_to_goal < robot.goal(3)
+            goal = 1;
+        end
+    else
+        if (dis_to_goal < 0.1)
+            goal = 1;
+        end
     end
-% if(   abs(xPose-robot.goal(1))<0.6&&    abs( yPose-robot.goal(2))<0.6);
-%                   goal = 1;
-%                 end
-
-
-
+    % if(   abs(xPose-robot.goal(1))<0.6&&    abs( yPose-robot.goal(2))<0.6);
+    %                   goal = 1;
+    %                 end
+    
     % calculate distance - stoping criterion
     dist=dist-abs((vel(1)*robot.param(2)/2+vel(2)*robot.param(3)/2)*ts);
     

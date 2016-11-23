@@ -15,6 +15,11 @@ end
 f1 = figure();
 f1.Position = [100 1 650 750];
 
+% A unit circle data
+cir = 1:359;
+cir_x = cos(cir);
+cir_y = sin(cir);
+
 for t=1:1/(Ts*10):length(pose)
     
     %plotting environment
@@ -28,7 +33,9 @@ for t=1:1/(Ts*10):length(pose)
     if plotRoute
         plot(pose(1,1:t),pose(2,1:t));
     end
-    plot(robot.goal(1),robot.goal(2),'go');
+    
+    %plot the goal
+    plot(robot.goal(3)*cir_x + robot.goal(1),robot.goal(3)*cir_y + robot.goal(2),'g');
     %plotting robot body
     a = robot.size(1);    % robot length
     b = robot.size(2);    % robot width
@@ -65,10 +72,10 @@ for t=1:1/(Ts*10):length(pose)
     text(-9.8,12.4,['X: ' num2str(pose(1,t))]);
     text(-9.8,11.4,['Y: ' num2str(pose(2,t))]);
     text(-4.8,13.4,'Laser readings');
-    text(-4.8,12.4,['Left: ' num2str(laserHist(6,t))]);
-    text(-4.8,11.4,['Center: ' num2str(laserHist(4,t))]);
-    text(1.8,12.4,['Right: ' num2str(laserHist(2,t))]);
-    text(1.8,11.4,['Goal: ' num2str(gtHist(2,t))]);
+    text(-4.8,12.4,['Left: ' num2str(laserHist(3,t))]);
+    text(-4.8,11.4,['Center: ' num2str(laserHist(2,t))]);
+    text(1.8,12.4,['Right: ' num2str(laserHist(1,t))]);
+    text(1.8,11.4,['Goal Visible: ' num2str(gtHist(2,t))]);
     hold off;
 
     % plot parameters

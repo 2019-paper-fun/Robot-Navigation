@@ -91,6 +91,9 @@ for i = 1:epoch
     end
     
     MSEav(i) = MSE/length(data{1});
+    
+    disp('MSE: ')
+    disp(MSEav(i))
 end
 
 end
