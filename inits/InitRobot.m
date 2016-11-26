@@ -1,7 +1,6 @@
 %INITIALIZATION
 %   robot.pose - pose of the robot [x; y; theta]
-%   robot.param - robot parameters [wheels separation; wheel1 radius;
-%   wheel2 radius]
+%   robot.param - robot parameters [wheels separation; wheel1 radius; wheel2 radius]
 %   robot.size - size of robot's body [length; width]
 %   robot.laseAngles - angles of the lasers; [rightmost to leftmost]
 %   robot.goal = the goal! [x, y, goal radius]

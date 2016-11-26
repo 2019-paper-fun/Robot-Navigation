@@ -2,13 +2,14 @@ function [] = Simulation(pose, laserHist, gtHist, maze, robot, collision, goal, 
 %SIMULATION Real-time simulation plotting
 %   pose - history of all poses of the robot
 %   laserHist - all laser measurements
+%   gtHist - ?
 %   maze - maze drawing coordinates
 %   robot - robot structure
 %   collision - collision flag
 %   plotRoute - set 1 to plot the route of the robot
 %   Ts - sampling time
 
-if nargin < 7
+if nargin < 7 % what is nargin?
     plotRoute = 0;
 end
 
@@ -20,21 +21,36 @@ cir = 1:359;
 cir_x = cos(cir);
 cir_y = sin(cir);
 
+%find the random goal position
+minFirstX=min([maze{1}(1,length(maze{1})-1), maze{1}(1,length(maze{1})-2)]);
+minSecondX=min([maze{2}(1,length(maze{2})-1), maze{2}(1,length(maze{2})-2)]);
+minFirstY=min([maze{1}(2,length(maze{1})-1), maze{1}(2,length(maze{1})-2)]);
+minSecondY=min([maze{2}(2,length(maze{2})-1), maze{2}(2,length(maze{2})-2)]);
+if minFirstX < minSecondX
+    robot.goal(1) = minFirstX+(minSecondX-minFirstX)*rand(1,1);
+else
+    robot.goal(1) = minSecondX+(minFirstX-minSecondX)*rand(1,1);
+end
+if minFirstY < minSecondY
+    robot.goal(2) = minFirstY+(minSecondY-minFirstY)*rand(1,1);
+else
+    robot.goal(2) = minSecondY+(minFirstY-minSecondY)*rand(1,1);
+end
+    
 for t=1:1/(Ts*10):length(pose)
     
     %plotting environment
     for i = 1:length(maze)
         plot(maze{i}(1,:), maze{i}(2,:), 'k');
         hold on;
-    end    
-    
+    end
     
     %plotting route
     if plotRoute
         plot(pose(1,1:t),pose(2,1:t));
     end
-    
-    %plot the goal
+
+    %plot the goal 
     plot(robot.goal(3)*cir_x + robot.goal(1),robot.goal(3)*cir_y + robot.goal(2),'g');
     %plotting robot body
     a = robot.size(1);    % robot length
