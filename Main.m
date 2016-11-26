@@ -21,7 +21,7 @@ nn_type = 1;
 
 % Select a data collection method (1 = static route, 2 = tunnel drive, 3 =
 % wall follow, 4 = mode4)
-mode = 1;
+mode = 4;
 
 % Add paths
 addpath('functions/');
@@ -70,6 +70,20 @@ for ii=1:9 %1:num_of_maze is for using all mazes, by changing the range, selecte
     %generate maze
     clear maze
     maze = GenerateMaze(maze_files(ii).name);
+    
+    % find the random goal position which is on the line of two points
+    % (a,b), (c,d)
+    a = maze{1}(1,length(maze{1})-1);
+    b = maze{1}(2,length(maze{1})-1);
+    c = maze{2}(1,length(maze{2})-1);
+    d = maze{2}(2,length(maze{2})-1);
+    if a<c
+        robot.goal(1) = a+(c-a)*rand(1,1);
+        robot.goal(2) = ((b-d)/(a-c))*(robot.goal(1)-a)+b;
+    else
+        robot.goal(1) = c+(a-c)*rand(1,1);
+        robot.goal(2) = ((b-d)/(a-c))*(robot.goal(1)-a)+b;
+    end
     
     %Record the initial laser readings
     [hist, lHist, gHist] = InitialLaserRead(robot, maze);

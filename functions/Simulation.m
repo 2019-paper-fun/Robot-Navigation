@@ -20,20 +20,6 @@ f1.Position = [100 1 650 750];
 cir = 1:359;
 cir_x = cos(cir);
 cir_y = sin(cir);
-
-% find the random goal position which is on the line of two points
-% (a,b), (c,d)
-a = maze{1}(1,length(maze{1})-1);
-b = maze{1}(2,length(maze{1})-1);
-c = maze{2}(1,length(maze{2})-1);
-d = maze{2}(2,length(maze{2})-1);
-if a<c
-    robot.goal(1) = a+(c-a)*rand(1,1);
-    robot.goal(2) = ((b-d)/(a-c))*(robot.goal(1)-a)+b;
-else
-    robot.goal(1) = c+(a-c)*rand(1,1);
-    robot.goal(2) = ((b-d)/(a-c))*(robot.goal(1)-a)+b;
-end
     
 for t=1:1/(Ts*10):length(pose)
     
