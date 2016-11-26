@@ -62,7 +62,7 @@ rng(1)
 %% Iterate through maze files to get multiple dataset
 count = 1; %count the number of mazes used in creating dataset
 % num_of_maze = 9;
-for ii=1:9 %1:num_of_maze is for using all mazes, by changing the range, selected mazes can be used.
+for ii=1:1 %1:num_of_maze is for using all mazes, by changing the range, selected mazes can be used.
     close all;
     %Initialize the robot
     InitRobot;
