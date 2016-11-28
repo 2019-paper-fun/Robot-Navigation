@@ -1,5 +1,5 @@
 function [poseHist, laserHist, velHist, gtHist, collision, goal] = Drive(robot, dist, vel, maze, ts, is_test)
-%DRIVE Driving the robot forward
+% DRIVE Driving the robot forward
 %   Inputs:
 %       - robot: robot structure
 %       - dist: distance to be driven [1x1]
@@ -64,7 +64,7 @@ while(dist>0 && ~collision && ~goal)
                 
                 measTmp = LaserMeas(laserPose(:,k), maze{i}(:,j), maze{i}(:,j+1));
                 
-                if  measTmp < bestLaserMeas(k);
+                if  measTmp < bestLaserMeas(k)
                     bestLaserMeas(k) = measTmp;
                 end
                 
@@ -97,11 +97,11 @@ while(dist>0 && ~collision && ~goal)
     % goal is met when the goal is within robot.goal(3) distance away from the sensor
     dis_to_goal = sqrt((laserPose(1,end)-robot.goal(1))^2 + (laserPose(2,end)-robot.goal(2))^2);
     if is_test
-        if dis_to_goal < robot.goal(3)
+        if dis_to_goal < 1.0
             goal = 1;
         end
     else
-        if (dis_to_goal < 0.1)
+        if (dis_to_goal < 1.0)
             goal = 1;
         end
     end
