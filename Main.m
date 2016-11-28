@@ -56,13 +56,13 @@ InitRobot;
 maze_files = dir('mazeLib/*.xlsx');
 num_of_maze=size(maze_files,1);
 
-%% Want some seed? %%
+% Want some seed? %%
 rng(1)
 
 %% Iterate through maze files to get multiple dataset
 count = 1; %count the number of mazes used in creating dataset
 % num_of_maze = 9;
-for ii=1:9 %1:num_of_maze is for using all mazes, by changing the range, selected mazes can be used.
+for ii=1:10 %1:num_of_maze is for using all mazes, by changing the range, selected mazes can be used.
     close all;
     %Initialize the robot
     InitRobot;
@@ -83,6 +83,20 @@ for ii=1:9 %1:num_of_maze is for using all mazes, by changing the range, selecte
     else
         robot.goal(1) = c+(a-c)*rand(1,1);
         robot.goal(2) = ((b-d)/(a-c))*(robot.goal(1)-a)+b;
+    end
+    
+    if( robot.goal(1)>7.5)
+       
+        robot.goal(1)=robot.goal(1)-0.9;
+    elseif(    robot.goal(2)>7.5)
+        robot.goal(2)=robot.goal(2)-0.3;
+        elseif(    robot.goal(1)<-7.5)
+                    robot.goal(1)=robot.goal(1)+0.9;
+                      
+            
+        elseif(    robot.goal(2)<-7.5)
+        
+             robot.goal(2)=robot.goal(2)+0.3;
     end
     
     %Record the initial laser readings

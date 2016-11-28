@@ -87,7 +87,7 @@ while(dist>0 && ~collision && ~goal)
     relativeAngle = laserPoseGoal(3) - robot.pose(3); %To be consistant with other laser angles -> +: goal is on left, -: goal is on right
     if relativeAngle > pi
         relativeAngle = relativeAngle - 2*pi;
-    else if relativeAngle < pi
+    else if relativeAngle < -pi
             relativeAngle = relativeAngle + 2*pi;
     end
     gtHist = [gtHist [relativeAngle; bestLaserMeas(end) == sqrt((laserPose(1,end)-robot.goal(1))^2 + (laserPose(2,end)-robot.goal(2))^2)]];
@@ -97,11 +97,11 @@ while(dist>0 && ~collision && ~goal)
     % goal is met when the goal is within robot.goal(3) distance away from the sensor
     dis_to_goal = sqrt((laserPose(1,end)-robot.goal(1))^2 + (laserPose(2,end)-robot.goal(2))^2);
     if is_test
-        if dis_to_goal < 1.0
+        if dis_to_goal < robot.goal(3)
             goal = 1;
         end
     else
-        if (dis_to_goal < 1.0)
+        if (dis_to_goal < 0.1)
             goal = 1;
         end
     end
