@@ -62,7 +62,7 @@ rng(1)
 %% Iterate through maze files to get multiple dataset
 count = 1; %count the number of mazes used in creating dataset
 % num_of_maze = 9;
-for ii=2:2 %1:num_of_maze is for using all mazes, by changing the range, selected mazes can be used.
+for ii=1:10 %1:num_of_maze is for using all mazes, by changing the range, selected mazes can be used.
     close all;
     %Initialize the robot
     InitRobot;
@@ -77,14 +77,10 @@ for ii=2:2 %1:num_of_maze is for using all mazes, by changing the range, selecte
     c = maze{2}(1,length(maze{2})-1);
     d = maze{2}(2,length(maze{2})-1);
     if a<c
-        a = a+1; % to make the goal far away from wall
-        c = c-1;  
-        robot.goal(1) = a+(c-a)*rand(1,1);
+        robot.goal(1) = (a+1)+((c-1)-(a+1))*rand(1,1); % to make the goal far away from wall
         robot.goal(2) = ((b-d)/(a-c))*(robot.goal(1)-a)+b;
     else
-        a = a-1;
-        c = c+1;
-        robot.goal(1) = c+(a-c)*rand(1,1);
+        robot.goal(1) = (c+1)+((a-1)-(c+1))*rand(1,1);
         robot.goal(2) = ((b-d)/(a-c))*(robot.goal(1)-a)+b;
     end
     
