@@ -53,12 +53,9 @@ sensor_ang = pi/2;
 maze_files = dir('mazeLib/*.xlsx');
 num_of_maze=size(maze_files,1);
 
-%% Want some seed? %%
-rng(1)
-
 %% Iterate through maze files to get multiple dataset
 % How many iterations per run?
-iterations = 100;
+iterations = 10;
 
 % Load the dataset from a mat file
 load('data/path_data/dataPer_list.mat');
@@ -71,6 +68,9 @@ temp_list = dataPer_list;
 count = length(temp_list); % Count the number of data exist in the dataset
 
 dataPer_list = cell(1, count + iterations);
+for iter = 1:count
+    dataPer_list{iter} = temp_list{iter}; % Copy back the original data
+end
 
 count = count + 1; % Increment the pointer for cell
 
@@ -157,10 +157,11 @@ xxxxxxxxxx
 
 %% Train the network using RNN
 
+% Load the dataset from a mat file
+load('data/path_data/dataPer_list.mat');
+
 % Initialize RNN
 InitRNN
-
-% dataPer_list{1} = dataPer;
 
 % Train RNN
 tic
@@ -178,6 +179,9 @@ ylabel('MSE');
 save('data/nn_data/trainedRNN.mat', 'nn');
 
 %% Train the network using MLP
+
+% Load the dataset from a mat file
+load('data/path_data/dataPer_list.mat');
 
 % Concatenate All Dataset - Only for MLP, not RNN
 dataPer = cell(1,2);
