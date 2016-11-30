@@ -101,7 +101,7 @@ while(dist>0 && ~collision && ~goal)
             goal = 1;
         end
     else
-        if (dis_to_goal < 0.1)
+        if (dis_to_goal < robot.goal(3)/2)
             goal = 1;
         end
     end
