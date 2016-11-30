@@ -62,7 +62,7 @@ rng(1)
 %% Iterate through maze files to get multiple dataset
 count = 1; %count the number of mazes used in creating dataset
 % num_of_maze = 9;
-for ii=1:10 %1:num_of_maze is for using all mazes, by changing the range, selected mazes can be used.
+for ii=7:7 %1:num_of_maze is for using all mazes, by changing the range, selected mazes can be used.
     close all;
     %Initialize the robot
     InitRobot;
@@ -72,16 +72,16 @@ for ii=1:10 %1:num_of_maze is for using all mazes, by changing the range, select
     maze = GenerateMaze(maze_files(ii).name);
     
     % find the random goal position which is on the line of two points (a,b), (c,d)
-    a = maze{1}(1,length(maze{1})-1);
-    b = maze{1}(2,length(maze{1})-1);
-    c = maze{2}(1,length(maze{2})-1);
-    d = maze{2}(2,length(maze{2})-1);
-    if a<c
-        robot.goal(1) = (a+1)+((c-1)-(a+1))*rand(1,1); % to make the goal far away from wall
-        robot.goal(2) = ((b-d)/(a-c))*(robot.goal(1)-a)+b;
+    ag = maze{1}(1,length(maze{1})-1);
+    bg = maze{1}(2,length(maze{1})-1);
+    cg = maze{2}(1,length(maze{2})-1);
+    dg = maze{2}(2,length(maze{2})-1);
+    if ag<cg
+        robot.goal(1) = (ag+1)+((cg-1)-(ag+1))*rand(1,1); % to make the goal far away from wall
+        robot.goal(2) = ((bg-dg)/(ag-cg))*(robot.goal(1)-ag)+bg;
     else
-        robot.goal(1) = (c+1)+((a-1)-(c+1))*rand(1,1);
-        robot.goal(2) = ((b-d)/(a-c))*(robot.goal(1)-a)+b;
+        robot.goal(1) = (cg+1)+((ag-1)-(cg+1))*rand(1,1);
+        robot.goal(2) = ((bg-dg)/(ag-cg))*(robot.goal(1)-ag)+bg;
     end
     
     %Record the initial laser readings

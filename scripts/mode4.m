@@ -9,7 +9,7 @@ while(~collision && ~goal)
     yPose = robot.pose(2)+((a-b)/2+b/2)*sin(robot.pose(3));
 
     if(gtHist(2,end)==0) % goal is invisible
-        if laserHist(4, end)<4
+        if laserHist(4, end)<3 ||  laserHist(5,end) <2.6 ||laserHist(3,end)<2.6
             if( laserHist(5,end) <laserHist(3,end))
                 [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
                 HistoryUpdate;
