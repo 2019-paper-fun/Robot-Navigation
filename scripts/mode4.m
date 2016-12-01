@@ -7,17 +7,25 @@ while(~collision && ~goal)
     
     xPose = robot.pose(1)+((a-b)/2+b/2)*cos(robot.pose(3));
     yPose = robot.pose(2)+((a-b)/2+b/2)*sin(robot.pose(3));
-
+    
     if(gtHist(2,end)==0) % goal is invisible
-        if laserHist(4, end)<3 ||  laserHist(5,end) <2.6 ||laserHist(3,end)<2.6
-            if( laserHist(5,end) <laserHist(3,end))
+        
+        if laserHist(4, end) < 2
+            if(laserHist(7,end) + laserHist(6,end) + laserHist(5,end) < laserHist(3,end) + laserHist(2,end) + laserHist(1,end))
                 [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
                 HistoryUpdate;
-                
             else
                 [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
                 HistoryUpdate;
             end
+            
+        elseif laserHist(5,end)<2.6
+            [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
+            HistoryUpdate;
+            
+        elseif laserHist(3,end)<2.6
+            [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
+            HistoryUpdate;
             
         elseif laserHist(6,end)<2.3
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
@@ -36,42 +44,45 @@ while(~collision && ~goal)
             HistoryUpdate;
             
         else
-            
-            [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0.5; 0.5], maze, Ts);
-            HistoryUpdate;
-            
+            if(laserHist(7,end) + laserHist(6,end) + laserHist(5,end) < laserHist(3,end) + laserHist(2,end) + laserHist(1,end))
+                [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
+                HistoryUpdate;
+            else
+                [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
+                HistoryUpdate;
+                %             else
+                %             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 1], maze, Ts);
+                %             HistoryUpdate;
+            end
         end
         
         
     elseif(gtHist(2,end)==1)
-        
-        if laserHist(5,end)<1.4
+        if laserHist(5,end) < 1
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(3,end)<1.4
+        elseif laserHist(3,end) < 1
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(6,end)<1
+        elseif laserHist(6,end) < 1
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(2,end)<1
+        elseif laserHist(2,end) < 1
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(7,end)<0.9
+        elseif laserHist(7,end) < 0.7
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(1,end)<0.9
+        elseif laserHist(1,end) < 0.7
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
             
-        else % if there is no obstacle on the front
-            
-            
+        else % if a collision is not imminent
             relativeAngle = atan2(robot.goal(2) - yPose, robot.goal(1) - xPose) - robot.pose(3); %To be consistant with other laser angles -> +: goal is on left, -: goal is on right
             if relativeAngle > pi
                 relativeAngle = relativeAngle - 2*pi;
@@ -79,7 +90,7 @@ while(~collision && ~goal)
                 relativeAngle = relativeAngle + 2*pi;
             end
             
-            if     relativeAngle<0
+            if relativeAngle<0
                 [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1;0], maze, Ts);
                 HistoryUpdate;
                 
