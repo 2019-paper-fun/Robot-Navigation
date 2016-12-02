@@ -223,7 +223,7 @@ load('data/nn_data/trainedRNN.mat');
 load('data/nn_data/trainedMLP.mat');
 
 %% Test the trained network using RNN
-maze = GenerateMaze('maze13.xlsx');
+maze = GenerateMaze('maze7.xlsx');
 
 % Chansol Hong - planning to make InitRobot() function to do this easily
 InitRobot
