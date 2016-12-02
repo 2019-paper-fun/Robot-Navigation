@@ -69,16 +69,14 @@ for t=1:1/(Ts*10):length(pose)
     %plotting robot position and laser readings    
     rectangle('Position',[-10 11 20 3])
     text(-9.8,13.4,'Robot position');
-    text(-9.8,12.4,['X: ' num2str(xLaser)]);
-    text(-9.8,11.4,['Y: ' num2str(yLaser)]);
-%     text(-9.8,12.4,['X: ' num2str(pose(1,t))]);
-%     text(-9.8,11.4,['Y: ' num2str(pose(2,t))]);
+    text(-9.8,12.4,['X: ' num2str(pose(1,t))]);
+    text(-9.8,11.4,['Y: ' num2str(pose(2,t))]);
     text(-4.8,13.4,'Laser readings');
-    text(-4.8,12.4,['Left: ' num2str(laserHist(5,t))]);
+    text(-4.8,12.4,['Left: ' num2str(laserHist(6,t))]);
     text(-4.8,11.4,['Center: ' num2str(laserHist(4,t))]);
-    text(1.8,12.4,['Right: ' num2str(laserHist(3,t))]);
-    text(1.8,11.4,['Goal Visible: ' num2str(sqrt((xLaser - robot.goal(1))^2 + (yLaser - robot.goal(2))^2))]);
-%     text(1.8,11.4,['Goal Visible: ' num2str(gtHist(2,t))]);
+    text(1.8,12.4,['Right: ' num2str(laserHist(2,t))]);
+%     text(1.8,11.4,['Goal Distance: ' num2str(sqrt((xLaser - robot.goal(1))^2 + (yLaser - robot.goal(2))^2))]);
+    text(1.8,11.4,['Goal Visible: ' num2str(gtHist(2,t))]);
     hold off;
 
     % plot parameters

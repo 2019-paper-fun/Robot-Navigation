@@ -6,10 +6,13 @@ if nn.mode == 1 %Jordan-like RNN
     for ii = 1:nn.option.maxIter
         disp('Iteration: ')
         disp(ii)
+        index = randperm(length(dataset));       %random perm index
+        
+        
         for jj = 1:length(dataset)
             % Fetch data
-            input = dataset{jj}{1}';
-            output = dataset{jj}{2}';
+            input = dataset{index(jj)}{1}';
+            output = dataset{index(jj)}{2}';
             
             % Feed-forward Through Time
             nodes = nnFFTT(input, nn);

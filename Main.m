@@ -15,6 +15,9 @@
 clc;
 clear all;
 
+% Timestep
+Ts = 0.01;
+
 % Select a neural network type (1 = RNN, 2 = MLP)
 nn_type = 1;
 % nn_type = 2;
@@ -55,7 +58,7 @@ num_of_maze=size(maze_files,1);
 
 %% Iterate through maze files to get multiple dataset
 % How many iterations per run?
-iterations = 10;
+iterations = 13;
 
 % Load the dataset from a mat file
 load('data/path_data/dataPer_list.mat');
@@ -138,10 +141,10 @@ for ii=1:iterations
         count = count + 1;
     else
         disp('Collision!')
-%         Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
-%         pause;
+        %         Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
+        %         pause;
     end
-
+    
 end
 
 % Remove empty cells due to failure
@@ -160,6 +163,11 @@ xxxxxxxxxx
 % Load the dataset from a mat file
 load('data/path_data/dataPer_list.mat');
 
+% Transform the dataset so that laser nodes are not much greather than goal nodes
+for i = 1:length(dataPer_list)
+    dataPer_list{i}{1}(1:7,:) = dataPer_list{i}{1}(1:7,:)/30; %Lasers [0 30] -> [0 1]
+    dataPer_list{i}{1}(8,:) = dataPer_list{i}{1}(8,:)/(2*pi) + 0.5; %Goal angle [-pi pi] -> [0 1]
+end
 % Initialize RNN
 InitRNN
 
@@ -215,16 +223,46 @@ load('data/nn_data/trainedRNN.mat');
 load('data/nn_data/trainedMLP.mat');
 
 %% Test the trained network using RNN
-maze = GenerateMaze('maze5.xlsx');
+maze = GenerateMaze('maze13.xlsx');
 
 % Chansol Hong - planning to make InitRobot() function to do this easily
-robot  = struct('pose', [7; -8; 3*pi/4] ,'param',[5; 2; 2], 'size', [1.5, 1], 'laserAngles', -sensor_ang:2*sensor_ang/(sensor_num - 1):sensor_ang, 'goal',[-7.25; 7.6; 0.3]);
-poseHist = [];
-laserHist = [];
-velHist = [];
-gtHist = [];
-collision = 0;
-goal = 0;
+InitRobot
+
+% find the random goal position which is on the line of two points (a,b), (c,d)
+wall_detector = -pi+0.01:2*pi/360:pi;
+ok = 0;
+while (~ok) % try to find a goal position that is reachable
+    ag = maze{1}(1,length(maze{1})-1);
+    bg = maze{1}(2,length(maze{1})-1);
+    cg = maze{2}(1,length(maze{2})-1);
+    dg = maze{2}(2,length(maze{2})-1);
+    
+    robot.goal(1) = ag+(cg-ag)*rand(1,1); % to make the goal far away from wall
+    robot.goal(2) = ((bg-dg)/(ag-cg))*(robot.goal(1)-ag)+bg;
+    
+    % detect a wall closest to the goal
+    min_dist = 100; % a large number
+    for k=1:length(wall_detector)
+        for i=1:length(maze)
+            for j=1:(length(maze{i})-1)
+                % vertical line elimination
+                if maze{i}(1,j)==maze{i}(1,j+1)
+                    maze{i}(1,j) = maze{i}(1,j)+10e-10;
+                end
+                measTmp = LaserMeas([robot.goal(1); robot.goal(2); wall_detector(k)], maze{i}(:,j), maze{i}(:,j+1));
+                if  measTmp < min_dist
+                    min_dist = measTmp;
+                end
+            end
+        end
+    end
+    
+    % if closest wall is far enough, you can pass
+    if (min_dist > 1.5*robot.size(2)/2)
+        ok = 1;
+        disp('Good')
+    end
+end
 
 [hist, lHist, gHist] = InitialLaserRead(robot, maze);
 vel = [0;0]; %Robot is always initially halt
@@ -234,19 +272,29 @@ context = zeros(1, nn.option.numContext);
 
 check = 0;
 while(~collision && ~goal)
-    %     disp('Step: ')
-    %     disp(check)
-    %     disp(hist )
-    check = check + 1;
-    [vOut, context] = nnSingleFF([laserHist(1:end-1,end)' gtHist(:,end)'], context, nn);
-    v = vOut' > 0.5;
+    vect = [laserHist(1:end-1,end)' gtHist(:,end)'];
+    vect(1:7) = vect(1:7)/30;
+    vect(8) = vect(8)/(2*pi) + 0.5;
+    [vOut, context] = nnSingleFF(vect, context, nn);
+    v = round(vOut');
     
+    if sum(v) == 0
+        if vOut(1) > vOut(2)
+            v = [1;0];
+        else
+            v = [0;1];
+        end
+    end
+
     [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, v, maze, Ts, 1);
     HistoryUpdate;
 end
 
+%Simulation of the route
+Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
+
 %% Test the trained network using MLP
-maze = GenerateMaze('maze5.xlsx');
+maze = GenerateMaze('maze2.xlsx');
 
 % Chansol Hong - planning to make InitRobot() function to do this easily
 robot  = struct('pose', [7; -8; 3*pi/4] ,'param',[5; 2; 2], 'size', [1.5, 1], 'laserAngles', -sensor_ang:2*sensor_ang/(sensor_num - 1):sensor_ang, 'goal',[-7.25; 7.6; 0.3]);
