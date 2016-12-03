@@ -86,7 +86,7 @@ for ii=1:iterations
     %generate maze
     clear maze
     
-    maze_number = randi(num_of_maze); % randomly select a map
+    maze_number = ii; %randi(num_of_maze); % randomly select a map
     
     maze = GenerateMaze(maze_files(maze_number).name);
     fprintf('Gather data in %s\n', maze_files(maze_number).name);
@@ -136,6 +136,7 @@ for ii=1:iterations
     
     if (goal)
         disp('Goal Reached')
+        SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, strcat('data',num2str(count)); %Save the figure
         maze_history(maze_number) = maze_history(maze_number) + 1;
         dataPer_list{count} = {[laserHist(1:end-1,:); gtHist(:,:)] velHist};
         count = count + 1;
@@ -223,7 +224,7 @@ load('data/nn_data/trainedRNN.mat');
 load('data/nn_data/trainedMLP.mat');
 
 %% Test the trained network using RNN
-maze = GenerateMaze('maze7.xlsx');
+maze = GenerateMaze('maze5.xlsx');
 
 % Chansol Hong - planning to make InitRobot() function to do this easily
 InitRobot
@@ -292,6 +293,9 @@ end
 
 %Simulation of the route
 Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
+
+%% Save the simulation result if you want
+SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, 'result');
 
 %% Test the trained network using MLP
 maze = GenerateMaze('maze2.xlsx');

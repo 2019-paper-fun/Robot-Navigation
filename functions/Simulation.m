@@ -9,7 +9,7 @@ function [] = Simulation(pose, laserHist, gtHist, maze, robot, collision, goal, 
 %   plotRoute - set 1 to plot the route of the robot
 %   Ts - sampling time
 
-if nargin < 7 % what is nargin?
+if nargin < 7 % what is nargin? Number of Arguments in Input - default parameter similar to argc in C
     plotRoute = 0;
 end
 
