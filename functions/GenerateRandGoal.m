@@ -1,4 +1,4 @@
-function [] = GenerateRandGoal( robot, maze )
+function [robot] = GenerateRandGoal( robot, maze )
 %GenerateStartNGoal - Generate the initial point of robot and goal point of the maze
 %   robot: robot
 %   maze: maze

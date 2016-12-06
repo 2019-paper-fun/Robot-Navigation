@@ -84,9 +84,9 @@ for ii=1:iterations
         
         maze = GenerateMaze(maze_files(maze_number).name);
         fprintf('Gather data in %s\n', maze_files(maze_number).name);
-        
-        GenerateRandGoal(robot,maze) % find the random goal position       
-        
+
+        robot = GenerateRandGoal(robot,maze); % find the random goal position       
+
         %Record the initial laser readings
         [hist, lHist, gHist] = InitialLaserRead(robot, maze);
         vel = [0;0]; %Robot is always initially halt
@@ -190,20 +190,28 @@ load('data/nn_data/trainedMLP.mat');
 maze = GenerateMaze('maze02.xlsx');
 
 InitRobot
-GenerateRandGoal(robot,maze) % find the random goal position
+robot = GenerateRandGoal(robot,maze); % find the random goal position
 
 [hist, lHist, gHist] = InitialLaserRead(robot, maze);
 vel = [0;0]; %Robot is always initially halt
 HistoryUpdate;
 
-context = zeros(1, nn.option.numContext);
+if nn.mode == 1
+    context = zeros(1, nn.option.numContext);
+elseif nn.mode == 2
+    context = zeros(1, nn.option.numHidden);
+end
 
 check = 0;
 while(~collision && ~goal)
     vect = [laserHist(1:end-1,end)' gtHist(:,end)'];
     vect(1:7) = vect(1:7)/30;
     vect(8) = vect(8)/(2*pi) + 0.5;
-    [vOut, context] = nnSingleFF(vect, context, nn);
+    if nn.mode == 1
+        [vOut, context] = nnSingleFF(vect, context, nn);
+    elseif nn.mode == 2
+        [vOut, context] = nnSingleFF_Elman(vect, context, nn);
+    end
     v = round(vOut');
     
     if sum(v) == 0
@@ -234,7 +242,7 @@ SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, 'result
 maze = GenerateMaze('maze2.xlsx');
 
 InitRobot
-GenerateRandGoal(robot,maze) % find the random goal position.
+robot = GenerateRandGoal(robot,maze); % find the random goal position.
 
 [hist, lHist, gHist] = InitialLaserRead(robot, maze);
 vel = [0;0]; %Robot is always initially halt
