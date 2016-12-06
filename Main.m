@@ -18,10 +18,6 @@ clear all;
 % Timestep
 Ts = 0.01;
 
-% Select a neural network type (1 = RNN, 2 = MLP)
-nn_type = 1;
-% nn_type = 2;
-
 % Select a data collection method (1 = static route, 2 = tunnel drive, 3 =
 % wall follow, 4 = mode4)
 mode = 4;
@@ -32,12 +28,8 @@ addpath('mazeLib/');
 addpath(genpath('data'));
 addpath('inits/');
 addpath('scripts/');
-
-if nn_type == 1
-    addpath(genpath('RNN'));
-else
-    addpath('mlp/');
-end
+addpath('RNN/'); % RNN path
+addpath('mlp/'); % mlp path
 
 %Define strategies
 strategies = {'StaticRoute' 'TunnelDrive' 'WallFollow' 'mode4'};
@@ -93,40 +85,7 @@ for ii=1:iterations
         maze = GenerateMaze(maze_files(maze_number).name);
         fprintf('Gather data in %s\n', maze_files(maze_number).name);
         
-        % find the random goal position which is on the line of two points (a,b), (c,d)
-        wall_detector = -pi+0.01:2*pi/360:pi;
-        ok = 0;
-        while (~ok) % try to find a goal position that is reachable
-            ag = maze{1}(1,length(maze{1})-1);
-            bg = maze{1}(2,length(maze{1})-1);
-            cg = maze{2}(1,length(maze{2})-1);
-            dg = maze{2}(2,length(maze{2})-1);
-            
-            robot.goal(1) = ag+(cg-ag)*rand(1,1); % to make the goal far away from wall
-            robot.goal(2) = ((bg-dg)/(ag-cg))*(robot.goal(1)-ag)+bg;
-            
-            % detect a wall closest to the goal
-            min_dist = 100; % a large number
-            for k=1:length(wall_detector)
-                for i=1:length(maze)
-                    for j=1:(length(maze{i})-1)
-                        % vertical line elimination
-                        if maze{i}(1,j)==maze{i}(1,j+1)
-                            maze{i}(1,j) = maze{i}(1,j)+10e-10;
-                        end
-                        measTmp = LaserMeas([robot.goal(1); robot.goal(2); wall_detector(k)], maze{i}(:,j), maze{i}(:,j+1));
-                        if  measTmp < min_dist
-                            min_dist = measTmp;
-                        end
-                    end
-                end
-            end
-            
-            % if closest wall is far enough, you can pass
-            if (min_dist > 1.5*robot.size(2)/2)
-                ok = 1;
-            end
-        end
+        GenerateRandGoal(robot,maze) % find the random goal position       
         
         %Record the initial laser readings
         [hist, lHist, gHist] = InitialLaserRead(robot, maze);
@@ -229,44 +188,8 @@ load('data/nn_data/trainedMLP.mat');
 %% Test the trained network using RNN
 maze = GenerateMaze('maze02.xlsx');
 
-% Chansol Hong - planning to make InitRobot() function to do this easily
 InitRobot
-
-% find the random goal position which is on the line of two points (a,b), (c,d)
-wall_detector = -pi+0.01:2*pi/360:pi;
-ok = 0;
-while (~ok) % try to find a goal position that is reachable
-    ag = maze{1}(1,length(maze{1})-1);
-    bg = maze{1}(2,length(maze{1})-1);
-    cg = maze{2}(1,length(maze{2})-1);
-    dg = maze{2}(2,length(maze{2})-1);
-    
-    robot.goal(1) = ag+(cg-ag)*rand(1,1); % to make the goal far away from wall
-    robot.goal(2) = ((bg-dg)/(ag-cg))*(robot.goal(1)-ag)+bg;
-    
-    % detect a wall closest to the goal
-    min_dist = 100; % a large number
-    for k=1:length(wall_detector)
-        for i=1:length(maze)
-            for j=1:(length(maze{i})-1)
-                % vertical line elimination
-                if maze{i}(1,j)==maze{i}(1,j+1)
-                    maze{i}(1,j) = maze{i}(1,j)+10e-10;
-                end
-                measTmp = LaserMeas([robot.goal(1); robot.goal(2); wall_detector(k)], maze{i}(:,j), maze{i}(:,j+1));
-                if  measTmp < min_dist
-                    min_dist = measTmp;
-                end
-            end
-        end
-    end
-    
-    % if closest wall is far enough, you can pass
-    if (min_dist > 1.5*robot.size(2)/2)
-        ok = 1;
-        disp('Good')
-    end
-end
+GenerateRandGoal(robot,maze) % find the random goal position
 
 [hist, lHist, gHist] = InitialLaserRead(robot, maze);
 vel = [0;0]; %Robot is always initially halt
@@ -309,14 +232,8 @@ SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, 'result
 %% Test the trained network using MLP
 maze = GenerateMaze('maze2.xlsx');
 
-% Chansol Hong - planning to make InitRobot() function to do this easily
-robot  = struct('pose', [7; -8; 3*pi/4] ,'param',[5; 2; 2], 'size', [1.5, 1], 'laserAngles', -sensor_ang:2*sensor_ang/(sensor_num - 1):sensor_ang, 'goal',[-7.25; 7.6; 0.3]);
-poseHist = [];
-laserHist = [];
-velHist = [];
-gtHist = [];
-collision = 0;
-goal = 0;
+InitRobot
+GenerateRandGoal(robot,maze) % find the random goal position
 
 [hist, lHist, gHist] = InitialLaserRead(robot, maze);
 vel = [0;0]; %Robot is always initially halt
