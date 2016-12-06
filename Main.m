@@ -233,7 +233,7 @@ SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, 'result
 maze = GenerateMaze('maze2.xlsx');
 
 InitRobot
-GenerateRandGoal(robot,maze) % find the random goal position
+GenerateRandGoal(robot,maze) % find the random goal position.
 
 [hist, lHist, gHist] = InitialLaserRead(robot, maze);
 vel = [0;0]; %Robot is always initially halt
