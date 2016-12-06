@@ -3,6 +3,9 @@ b = robot.size(2);  % robot width
 [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 1], maze, Ts); % go front at the initial pose
 HistoryUpdate;
 
+scale = 0.1;
+scale2 = 0.1;
+
 while(~collision && ~goal)
     
     xPose = robot.pose(1)+((a-b)/2+b/2)*cos(robot.pose(3));
@@ -10,7 +13,7 @@ while(~collision && ~goal)
     
     if(gtHist(2,end)==0) % goal is invisible
         
-        if laserHist(4, end) < 2
+        if laserHist(4, end) < 2 + scale
             if(laserHist(7,end) + laserHist(6,end) + laserHist(5,end) < laserHist(3,end) + laserHist(2,end) + laserHist(1,end))
                 [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
                 HistoryUpdate;
@@ -19,27 +22,27 @@ while(~collision && ~goal)
                 HistoryUpdate;
             end
             
-        elseif laserHist(5,end)<2.6
+        elseif laserHist(5,end)< 2.6 + scale
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(3,end)<2.6
+        elseif laserHist(3,end)< 2.6 + scale
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(6,end)<2.3
+        elseif laserHist(6,end)< 2.3 + scale
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(2,end)<2.3
+        elseif laserHist(2,end)< 2.3 + scale
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(7,end)<2.1
+        elseif laserHist(7,end)< 2.1 + scale
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(1,end)<2.1
+        elseif laserHist(1,end)< 2.1 + scale
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
             
@@ -58,27 +61,27 @@ while(~collision && ~goal)
         
         
     elseif(gtHist(2,end)==1)
-        if laserHist(5,end) < 1
+        if laserHist(5,end) < 1 + scale2
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(3,end) < 1
+        elseif laserHist(3,end) < 1 + scale2
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(6,end) < 1
+        elseif laserHist(6,end) < 1 + scale2
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(2,end) < 1
+        elseif laserHist(2,end) < 1 + scale2
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(7,end) < 0.7
+        elseif laserHist(7,end) < 0.7 + scale2
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
             
-        elseif laserHist(1,end) < 0.7
+        elseif laserHist(1,end) < 0.7 + scale2
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
             

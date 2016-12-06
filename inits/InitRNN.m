@@ -4,7 +4,7 @@
 nn.mode = 1;
 
 nn.option.learningRate = 0.005; 
-nn.option.maxIter = 350; 
+nn.option.maxIter = 250; 
 nn.option.numContext = 25; % Only used for Jordan-like RNN, Jordan type will determine # of context nodes by itself
 nn.option.numInput =  size(dataPer_list{1}{1},1)+nn.option.numContext; 
 nn.option.numOutput = size(dataPer_list{1}{2},1)+nn.option.numContext; 

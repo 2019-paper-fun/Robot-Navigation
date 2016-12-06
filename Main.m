@@ -58,12 +58,12 @@ num_of_maze=size(maze_files,1);
 
 %% Iterate through maze files to get multiple dataset
 % How many iterations per run?
-iterations = 13;
+iterations = num_of_maze;
 
 % Load the dataset from a mat file
-load('data/path_data/dataPer_list.mat');
-% dataPer_list = {};
-% maze_history = zeros(1,num_of_maze);
+% load('data/path_data/dataPer_list.mat');
+dataPer_list = {};
+maze_history = zeros(1,num_of_maze);
 
 % Copy the original
 temp_list = dataPer_list;
@@ -78,74 +78,77 @@ end
 count = count + 1; % Increment the pointer for cell
 
 for ii=1:iterations
-    fprintf('Iteration %d: Trying to gather Data #%d\n', ii, count);
-    close all;
-    %Initialize the robot
-    InitRobot;
-    
-    %generate maze
-    clear maze
-    
-    maze_number = ii; %randi(num_of_maze); % randomly select a map
-    
-    maze = GenerateMaze(maze_files(maze_number).name);
-    fprintf('Gather data in %s\n', maze_files(maze_number).name);
-    
-    % find the random goal position which is on the line of two points (a,b), (c,d)
-    wall_detector = -pi+0.01:2*pi/360:pi;
-    ok = 0;
-    while (~ok) % try to find a goal position that is reachable
-        ag = maze{1}(1,length(maze{1})-1);
-        bg = maze{1}(2,length(maze{1})-1);
-        cg = maze{2}(1,length(maze{2})-1);
-        dg = maze{2}(2,length(maze{2})-1);
+    success = 0;
+    while (success ~= 1) % Force the program to collect data until a successful path is made
+        fprintf('Iteration %d: Trying to gather Data #%d\n', ii, count);
+        close all;
+        %Initialize the robot
+        InitRobot;
         
-        robot.goal(1) = ag+(cg-ag)*rand(1,1); % to make the goal far away from wall
-        robot.goal(2) = ((bg-dg)/(ag-cg))*(robot.goal(1)-ag)+bg;
+        %generate maze
+        clear maze
         
-        % detect a wall closest to the goal
-        min_dist = 100; % a large number
-        for k=1:length(wall_detector)
-            for i=1:length(maze)
-                for j=1:(length(maze{i})-1)
-                    % vertical line elimination
-                    if maze{i}(1,j)==maze{i}(1,j+1)
-                        maze{i}(1,j) = maze{i}(1,j)+10e-10;
-                    end
-                    measTmp = LaserMeas([robot.goal(1); robot.goal(2); wall_detector(k)], maze{i}(:,j), maze{i}(:,j+1));
-                    if  measTmp < min_dist
-                        min_dist = measTmp;
+        maze_number = rem(ii,num_of_maze) + 1; %randi(num_of_maze); % randomly select a map
+        
+        maze = GenerateMaze(maze_files(maze_number).name);
+        fprintf('Gather data in %s\n', maze_files(maze_number).name);
+        
+        % find the random goal position which is on the line of two points (a,b), (c,d)
+        wall_detector = -pi+0.01:2*pi/360:pi;
+        ok = 0;
+        while (~ok) % try to find a goal position that is reachable
+            ag = maze{1}(1,length(maze{1})-1);
+            bg = maze{1}(2,length(maze{1})-1);
+            cg = maze{2}(1,length(maze{2})-1);
+            dg = maze{2}(2,length(maze{2})-1);
+            
+            robot.goal(1) = ag+(cg-ag)*rand(1,1); % to make the goal far away from wall
+            robot.goal(2) = ((bg-dg)/(ag-cg))*(robot.goal(1)-ag)+bg;
+            
+            % detect a wall closest to the goal
+            min_dist = 100; % a large number
+            for k=1:length(wall_detector)
+                for i=1:length(maze)
+                    for j=1:(length(maze{i})-1)
+                        % vertical line elimination
+                        if maze{i}(1,j)==maze{i}(1,j+1)
+                            maze{i}(1,j) = maze{i}(1,j)+10e-10;
+                        end
+                        measTmp = LaserMeas([robot.goal(1); robot.goal(2); wall_detector(k)], maze{i}(:,j), maze{i}(:,j+1));
+                        if  measTmp < min_dist
+                            min_dist = measTmp;
+                        end
                     end
                 end
             end
+            
+            % if closest wall is far enough, you can pass
+            if (min_dist > 1.5*robot.size(2)/2)
+                ok = 1;
+            end
         end
         
-        % if closest wall is far enough, you can pass
-        if (min_dist > 1.5*robot.size(2)/2)
-            ok = 1;
+        %Record the initial laser readings
+        [hist, lHist, gHist] = InitialLaserRead(robot, maze);
+        vel = [0;0]; %Robot is always initially halt
+        HistoryUpdate;
+        
+        %Run the selected strategy
+        run(strategies{mode});
+        
+        if (goal)
+            disp('Goal Reached')
+            SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, strcat('data',num2str(count))); %Save the figure
+            maze_history(maze_number) = maze_history(maze_number) + 1;
+            dataPer_list{count} = {[laserHist(1:end-1,:); gtHist(:,:)] velHist};
+            count = count + 1;
+            success = 1;
+        else
+            disp('Collision!')
+            %         Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
+            %         pause;
         end
     end
-    
-    %Record the initial laser readings
-    [hist, lHist, gHist] = InitialLaserRead(robot, maze);
-    vel = [0;0]; %Robot is always initially halt
-    HistoryUpdate;
-    
-    %Run the selected strategy
-    run(strategies{mode});
-    
-    if (goal)
-        disp('Goal Reached')
-        SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, strcat('data',num2str(count)); %Save the figure
-        maze_history(maze_number) = maze_history(maze_number) + 1;
-        dataPer_list{count} = {[laserHist(1:end-1,:); gtHist(:,:)] velHist};
-        count = count + 1;
-    else
-        disp('Collision!')
-        %         Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
-        %         pause;
-    end
-    
 end
 
 % Remove empty cells due to failure
@@ -166,7 +169,7 @@ load('data/path_data/dataPer_list.mat');
 
 % Transform the dataset so that laser nodes are not much greather than goal nodes
 for i = 1:length(dataPer_list)
-    dataPer_list{i}{1}(1:7,:) = dataPer_list{i}{1}(1:7,:)/30; %Lasers [0 30] -> [0 1]
+    dataPer_list{i}{1}(1:7,:) = dataPer_list{i}{1}(1:7,:)/30; %Lasers [0 30] -> [0 2]
     dataPer_list{i}{1}(8,:) = dataPer_list{i}{1}(8,:)/(2*pi) + 0.5; %Goal angle [-pi pi] -> [0 1]
 end
 % Initialize RNN
@@ -224,7 +227,7 @@ load('data/nn_data/trainedRNN.mat');
 load('data/nn_data/trainedMLP.mat');
 
 %% Test the trained network using RNN
-maze = GenerateMaze('maze5.xlsx');
+maze = GenerateMaze('maze02.xlsx');
 
 % Chansol Hong - planning to make InitRobot() function to do this easily
 InitRobot
@@ -289,6 +292,12 @@ while(~collision && ~goal)
 
     [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, v, maze, Ts, 1);
     HistoryUpdate;
+end
+
+if goal == 1
+    disp('Goal Reached')
+else
+    disp('Collision')
 end
 
 %Simulation of the route
