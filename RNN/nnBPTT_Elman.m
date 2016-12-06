@@ -1,8 +1,8 @@
-function nn = nnBPTT(output, nodes, nn)
+function nn = nnBPTT_Elman(output, nodes, nn)
 
 numSequence = size(output,1);
 numLayer = length(nn.option.netDim)-1; %1st layer<->2nd layer, 2nd layer<->3rd layer
-deltaContext = zeros(1, nn.option.numContext); % empty array - There is no error propagating from last context nodes
+deltaContext = zeros(1, nn.option.numHidden); % empty array - There is no error propagating from last context nodes
 
 deltaNN = nn.layer; % nn.layer: two weight cells -> each cell has that each layer-layer weight info
 
@@ -18,21 +18,22 @@ for ii = 1:numLayer
 end
 
 for ii = numSequence:-1:1 %Backpropagate from end to beginning
-    %     disp('seq')
-    %     disp(ii);
+%         disp('seq')
+%         disp(ii);
     for jj = numLayer:-1:1 %Same
-        %         disp('layer')
-        %         disp(jj);
+%                 disp('layer')
+%                 disp(jj);
         if jj==numLayer %each time step's weight to output layer
-            dOut = feval(nn.option.dActivation, nodes{ii, end}(1:2)); %derivative of activation function
-            delta = [nodes{ii,end}(1:size(output,2))-output(ii,:) deltaContext]; %error d - y
-            delta = [dOut ones(1,nn.option.numContext)].*delta;  %epsilon
-            %             delta = [nodes{ii,end}(1:size(output,2))-output(ii,:) deltaContext]; %error signal epsilon at output node, 1 x (output size + context size)
+            dOut = feval(nn.option.dActivation, nodes{ii, end}); %derivative of activation function
+            delta = nodes{ii,end}(1:size(output,2))-output(ii,:); %error d - y
+            delta = dOut.*delta;  %epsilon
+        elseif jj == numLayer - 1 %where recurrency resides
+            dOut = feval(nn.option.dActivation, nodes{ii,jj+1}); %derivative of activation function df_l+1/dx_l+1
+            delta = dOut.*(delta*nn.layer{jj+1}.W' + deltaContext); %dOut * weight = derivative df_l+1/dx_l     
         elseif jj~=numLayer %remaining layers
             dOut = feval(nn.option.dActivation, nodes{ii,jj+1}); %derivative of activation function df_l+1/dx_l+1
             delta = dOut.*(delta*nn.layer{jj+1}.W'); %dOut * weight = derivative df_l+1/dx_l
         end
-        
 %                  disp('epsilon')
 %                  disp(delta)
         
@@ -48,10 +49,8 @@ for ii = numSequence:-1:1 %Backpropagate from end to beginning
         %         disp(deltaNN{jj}.b)
     end
     
-    % Calculate deltaContext
-    dOut = feval(nn.option.dActivation, nodes{ii,1});
-    delta = dOut.*(delta*nn.layer{1}.W');
-    deltaContext = delta(end-nn.option.numContext+1:end);
+    % Get the delta of context node
+    deltaContext = delta*nn.layer{1}.W(end-nn.option.numHidden+1:end,:)';
 end
 
 for ii = 1:numLayer

@@ -7,8 +7,6 @@ if nn.mode == 1 %Jordan-like RNN
         disp('Iteration: ')
         disp(ii)
         index = randperm(length(dataset));       %random perm index
-        
-        
         for jj = 1:length(dataset)
             % Fetch data
             input = dataset{index(jj)}{1}';
@@ -33,9 +31,32 @@ if nn.mode == 1 %Jordan-like RNN
         disp('MSE: ')
         disp(MSE(ii))
     end
-else if nn.mode == 2 %Jordan RNN
-        
-       % 조던 네트웤 만들어볼거에요
-        
+elseif nn.mode == 2 %Elman RNN
+    for ii = 1:nn.option.maxIter
+        disp('Iteration: ')
+        disp(ii)
+        index = randperm(length(dataset));       %random perm index
+        for jj = 1:length(dataset)
+            % Fetch data
+            input = dataset{index(jj)}{1}';
+            output = dataset{index(jj)}{2}';
+            
+            % Feed-forward Through Time
+            nodes = nnFFTT_Elman(input, nn);
+
+            % Back-propagation Through Time
+            nn = nnBPTT_Elman(output, nodes, nn);
+            
+            % Get an error in current iteration.
+            result = zeros(size(output));
+            for kk = 1:size(nodes,1)
+                result(kk,:) = nodes{kk,end}(1:2);
+            end
+            
+            MSE(ii) = MSE(ii) + sum((result(:)-output(:)).^2)/size(output,1);
+        end
+        MSE(ii) = MSE(ii)/length(dataset);
+        disp('MSE: ')
+        disp(MSE(ii))
     end
 end

@@ -172,6 +172,7 @@ for i = 1:length(dataPer_list)
     dataPer_list{i}{1}(1:7,:) = dataPer_list{i}{1}(1:7,:)/30; %Lasers [0 30] -> [0 2]
     dataPer_list{i}{1}(8,:) = dataPer_list{i}{1}(8,:)/(2*pi) + 0.5; %Goal angle [-pi pi] -> [0 1]
 end
+
 % Initialize RNN
 InitRNN
 
