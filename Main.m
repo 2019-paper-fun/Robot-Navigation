@@ -28,7 +28,7 @@ addpath('mazeLib/');
 addpath(genpath('data'));
 addpath('inits/');
 addpath('scripts/');
-addpath('RNN/'); % RNN path
+addpath(genpath('RNN/')); % RNN path
 addpath('mlp/'); % mlp path
 
 %Define strategies
@@ -50,11 +50,11 @@ num_of_maze=size(maze_files,1);
 
 %% Iterate through maze files to get multiple dataset
 % How many iterations per run?
-iterations = num_of_maze;
+iterations = 900 %num_of_maze;
 
 % Load the dataset from a mat file
-% load('data/path_data/dataPer_list.mat');
-dataPer_list = {};
+load('data/path_data/dataPer_list.mat');
+%dataPer_list = {};
 maze_history = zeros(1,num_of_maze);
 
 % Copy the original
@@ -80,7 +80,7 @@ for ii=1:iterations
         %generate maze
         clear maze
         
-        maze_number = rem(ii,num_of_maze) + 1; %randi(num_of_maze); % randomly select a map
+        maze_number = 3 %rem(ii,num_of_maze) + 1; %randi(num_of_maze); % randomly select a map
         
         maze = GenerateMaze(maze_files(maze_number).name);
         fprintf('Gather data in %s\n', maze_files(maze_number).name);
@@ -97,7 +97,7 @@ for ii=1:iterations
         
         if (goal)
             disp('Goal Reached')
-            SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, strcat('data',num2str(count))); %Save the figure
+            %SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, strcat('data',num2str(count))); %Save the figure
             maze_history(maze_number) = maze_history(maze_number) + 1;
             dataPer_list{count} = {[laserHist(1:end-1,:); gtHist(:,:)] velHist};
             count = count + 1;
@@ -114,7 +114,7 @@ end
 dataPer_list = dataPer_list(1,1:count-1);
 
 % Save the dataset as a mat file
-save('data/path_data/dataPer_list.mat', 'dataPer_list', 'maze_history');
+save('data/path_data/bsk/dataPer_maze3.mat', 'dataPer_list', 'maze_history');
 
 %% Special Function to Save a Backup! %%
 xxxxxxxxxx
@@ -124,7 +124,7 @@ xxxxxxxxxx
 %% Train the network using RNN
 
 % Load the dataset from a mat file
-load('data/path_data/dataPer_list.mat');
+load('data/path_data/bsk/dataPer_maze3.mat');
 
 % Transform the dataset so that laser nodes are not much greather than goal nodes
 for i = 1:length(dataPer_list)
@@ -148,7 +148,7 @@ xlabel('Epochs');
 ylabel('MSE');
 
 % Save the network
-save('data/nn_data/trainedRNN.mat', 'nn');
+save('data/nn_data/bsk/JRNN_maze3_iter1000.mat', 'nn');
 
 %% Train the network using MLP
 
@@ -187,84 +187,98 @@ load('data/nn_data/trainedRNN.mat');
 load('data/nn_data/trainedMLP.mat');
 
 %% Test the trained network using RNN
-maze = GenerateMaze('maze02.xlsx');
 
-InitRobot
-robot = GenerateRandGoal(robot,maze); % find the random goal position
+goalReached = 0; % The number of time the robot reached to the goal
+iterations = 10; % The number of time to test
+for ii=1:iterations
+    disp('iterations: ')
+    disp(ii)
+    maze = GenerateMaze('maze01.xlsx');
 
-[hist, lHist, gHist] = InitialLaserRead(robot, maze);
-vel = [0;0]; %Robot is always initially halt
-HistoryUpdate;
+    InitRobot
+    robot = GenerateRandGoal(robot,maze) % find the random goal position
 
-if nn.mode == 1
-    context = zeros(1, nn.option.numContext);
-elseif nn.mode == 2
-    context = zeros(1, nn.option.numHidden);
-end
-
-check = 0;
-while(~collision && ~goal)
-    vect = [laserHist(1:end-1,end)' gtHist(:,end)'];
-    vect(1:7) = vect(1:7)/30;
-    vect(8) = vect(8)/(2*pi) + 0.5;
-    if nn.mode == 1
-        [vOut, context] = nnSingleFF(vect, context, nn);
-    elseif nn.mode == 2
-        [vOut, context] = nnSingleFF_Elman(vect, context, nn);
-    end
-    v = round(vOut');
-    
-    if sum(v) == 0
-        if vOut(1) > vOut(2)
-            v = [1;0];
-        else
-            v = [0;1];
-        end
-    end
-
-    [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, v, maze, Ts, 1);
+    [hist, lHist, gHist] = InitialLaserRead(robot, maze);
+    vel = [0;0]; %Robot is always initially halt
     HistoryUpdate;
+
+    context = zeros(1, nn.option.numContext);
+
+    check = 0;
+    while(~collision && ~goal)
+        vect = [laserHist(1:end-1,end)' gtHist(:,end)'];
+        vect(1:7) = vect(1:7)/30;
+        vect(8) = vect(8)/(2*pi) + 0.5;
+        [vOut, context] = nnSingleFF(vect, context, nn);
+        v = round(vOut');
+
+        if sum(v) == 0
+            if vOut(1) > vOut(2)
+                v = [1;0];
+            else
+                v = [0;1];
+            end
+        end
+
+        [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, v, maze, Ts, 1);
+        HistoryUpdate;
+    end
+
+    if goal == 1
+        goalReached =+ 1;
+        disp('goal reached!')
+    else
+        disp('collision!')
+    end
 end
 
-if goal == 1
-    disp('Goal Reached')
-else
-    disp('Collision')
-end
-
+sprintf('Reached goal %d times out of %d', goalReached, iterations)
 %Simulation of the route
-Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
+% Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
 
 %% Save the simulation result if you want
 SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, 'result');
 
 %% Test the trained network using MLP
-maze = GenerateMaze('maze2.xlsx');
 
-InitRobot
-robot = GenerateRandGoal(robot,maze); % find the random goal position.
+goalReached = 0; % The number of time the robot reached to the goal
+iterations = 10; % The number of time to test
+for ii=1:iterations
+    disp('iterations: ')
+    disp(ii)
+    maze = GenerateMaze('maze02.xlsx');
 
-[hist, lHist, gHist] = InitialLaserRead(robot, maze);
-vel = [0;0]; %Robot is always initially halt
-HistoryUpdate;
+    InitRobot
+    robot = GenerateRandGoal(robot,maze) % find the random goal position.
 
-while(~collision && ~goal)
-    vOut = MlpRun([laserHist(1:end-1,end); gtHist(:,end)], wIn, wHid, wOut, mlpParam);
-    v = round(vOut);
-    
-    if v == [0;0]
-        if vOut(1) > vOut(2)
-            v = [1;0];
-        else
-            v = [0;1];
-        end
-    end
-    
-    [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, v, maze, Ts, 1);
+    [hist, lHist, gHist] = InitialLaserRead(robot, maze);
+    vel = [0;0]; %Robot is always initially halt
     HistoryUpdate;
-    
-end
 
+    while(~collision && ~goal)
+        vOut = MlpRun([laserHist(1:end-1,end); gtHist(:,end)], wIn, wHid, wOut, mlpParam);
+        v = round(vOut);
+
+        if v == [0;0]
+            if vOut(1) > vOut(2)
+                v = [1;0];
+            else
+                v = [0;1];
+            end
+        end
+
+        [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, v, maze, Ts, 1);
+        HistoryUpdate;
+    end
+
+    if goal == 1
+        goalReached =+ 1;
+        disp('goal reached!')
+    else
+        disp('collision!')
+    end
+end
+sprintf('Reached goal %d times out of %d', goalReached, iterations)
 %% Run a simulation using data obtained from a NN
 
 %Simulation of the route
