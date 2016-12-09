@@ -50,10 +50,10 @@ num_of_maze=size(maze_files,1);
 
 %% Iterate through maze files to get multiple dataset
 % How many iterations per run?
-iterations = 900 %num_of_maze;
+iterations = 63 %num_of_maze;
 
 % Load the dataset from a mat file
-load('data/path_data/dataPer_list.mat');
+load('data/path_data/bsk/dataPer_maze1.mat');
 %dataPer_list = {};
 maze_history = zeros(1,num_of_maze);
 
@@ -80,7 +80,7 @@ for ii=1:iterations
         %generate maze
         clear maze
         
-        maze_number = 3 %rem(ii,num_of_maze) + 1; %randi(num_of_maze); % randomly select a map
+        maze_number = 1 %rem(ii,num_of_maze) + 1; %randi(num_of_maze); % randomly select a map
         
         maze = GenerateMaze(maze_files(maze_number).name);
         fprintf('Gather data in %s\n', maze_files(maze_number).name);
@@ -97,7 +97,7 @@ for ii=1:iterations
         
         if (goal)
             disp('Goal Reached')
-            %SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, strcat('data',num2str(count))); %Save the figure
+            % SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, strcat('data',num2str(count))); %Save the figure
             maze_history(maze_number) = maze_history(maze_number) + 1;
             dataPer_list{count} = {[laserHist(1:end-1,:); gtHist(:,:)] velHist};
             count = count + 1;
@@ -114,7 +114,7 @@ end
 dataPer_list = dataPer_list(1,1:count-1);
 
 % Save the dataset as a mat file
-save('data/path_data/bsk/dataPer_maze3.mat', 'dataPer_list', 'maze_history');
+save('data/path_data/bsk/dataPer_maze1.mat', 'dataPer_list', 'maze_history');
 
 %% Special Function to Save a Backup! %%
 xxxxxxxxxx
@@ -124,11 +124,11 @@ xxxxxxxxxx
 %% Train the network using RNN
 
 % Load the dataset from a mat file
-load('data/path_data/bsk/dataPer_maze3.mat');
+load('data/path_data/bsk/dataPer_maze1.mat');
 
 % Transform the dataset so that laser nodes are not much greather than goal nodes
 for i = 1:length(dataPer_list)
-    dataPer_list{i}{1}(1:7,:) = dataPer_list{i}{1}(1:7,:)/30; %Lasers [0 30] -> [0 2]
+    dataPer_list{i}{1}(1:7,:) = dataPer_list{i}{1}(1:7,:)/30; %Lasers [0 30] -> [0 1]
     dataPer_list{i}{1}(8,:) = dataPer_list{i}{1}(8,:)/(2*pi) + 0.5; %Goal angle [-pi pi] -> [0 1]
 end
 
@@ -148,12 +148,18 @@ xlabel('Epochs');
 ylabel('MSE');
 
 % Save the network
-save('data/nn_data/bsk/JRNN_maze3_iter1000.mat', 'nn');
+save('data/nn_data/bsk/JRNN_mz1_dt500_ep100_01.mat', 'nn');
 
 %% Train the network using MLP
 
 % Load the dataset from a mat file
-load('data/path_data/dataPer_list.mat');
+load('data/path_data/bsk/dataPer_maze1.mat');
+
+% Transform the dataset so that laser nodes are not much greather than goal nodes
+for i = 1:length(dataPer_list)
+    dataPer_list{i}{1}(1:7,:) = dataPer_list{i}{1}(1:7,:)/30; %Lasers [0 30] -> [0 2]
+    dataPer_list{i}{1}(8,:) = dataPer_list{i}{1}(8,:)/(2*pi) + 0.5; %Goal angle [-pi pi] -> [0 1]
+end
 
 % Concatenate All Dataset - Only for MLP, not RNN
 dataPer = cell(1,2);
@@ -178,25 +184,25 @@ xlabel('Epochs');
 ylabel('MSE');
 
 % Save the network
-save('data/nn_data/trainedMLP.mat', 'wIn', 'wHid', 'wOut', 'MSEav3', 'mlpParam');
+save('data/nn_data/bsk/MLP_mz1_dt100_ep10_01.mat', 'wIn', 'wHid', 'wOut', 'MSEav3', 'mlpParam');
 
 %% Load a trained RNN network if necessary
-load('data/nn_data/trainedRNN.mat');
+load('data/nn_data/bsk/JRNN_maze3_iter100.mat');
 
 %% Load a trained MLP network if necessary
-load('data/nn_data/trainedMLP.mat');
+load('data/nn_data/bsk/MLP_mz1_dt100_ep10_030.mat');
 
 %% Test the trained network using RNN
 
 goalReached = 0; % The number of time the robot reached to the goal
-iterations = 10; % The number of time to test
+iterations = 30; % The number of time to test
 for ii=1:iterations
     disp('iterations: ')
     disp(ii)
     maze = GenerateMaze('maze01.xlsx');
 
     InitRobot
-    robot = GenerateRandGoal(robot,maze) % find the random goal position
+    robot = GenerateRandGoal(robot,maze); % find the random goal position
 
     [hist, lHist, gHist] = InitialLaserRead(robot, maze);
     vel = [0;0]; %Robot is always initially halt
@@ -225,16 +231,17 @@ for ii=1:iterations
     end
 
     if goal == 1
-        goalReached =+ 1;
+        goalReached = goalReached + 1;
         disp('goal reached!')
     else
         disp('collision!')
     end
+    SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, 'result');
 end
 
 sprintf('Reached goal %d times out of %d', goalReached, iterations)
 %Simulation of the route
-% Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
+%Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
 
 %% Save the simulation result if you want
 SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, 'result');
@@ -242,14 +249,14 @@ SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, 'result
 %% Test the trained network using MLP
 
 goalReached = 0; % The number of time the robot reached to the goal
-iterations = 10; % The number of time to test
+iterations = 30; % The number of time to test
 for ii=1:iterations
     disp('iterations: ')
     disp(ii)
-    maze = GenerateMaze('maze02.xlsx');
+    maze = GenerateMaze('maze01.xlsx');
 
     InitRobot
-    robot = GenerateRandGoal(robot,maze) % find the random goal position.
+    robot = GenerateRandGoal(robot,maze); % find the random goal position.
 
     [hist, lHist, gHist] = InitialLaserRead(robot, maze);
     vel = [0;0]; %Robot is always initially halt
@@ -259,7 +266,7 @@ for ii=1:iterations
         vOut = MlpRun([laserHist(1:end-1,end); gtHist(:,end)], wIn, wHid, wOut, mlpParam);
         v = round(vOut);
 
-        if v == [0;0]
+        if sum(v) == 0
             if vOut(1) > vOut(2)
                 v = [1;0];
             else
@@ -277,6 +284,7 @@ for ii=1:iterations
     else
         disp('collision!')
     end
+    SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, 'result');
 end
 sprintf('Reached goal %d times out of %d', goalReached, iterations)
 %% Run a simulation using data obtained from a NN
