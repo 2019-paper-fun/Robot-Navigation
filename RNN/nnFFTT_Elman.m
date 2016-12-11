@@ -2,7 +2,7 @@ function nodes = nnFFTT_Elman(input, nn)
 
 numSequence = size(input,1); %data length
 nodes = cell(numSequence, length(nn.option.netDim)); %expanded network
-context = zeros(1, nn.option.numHidden); %initial context node values
+context = rand(1, nn.option.numHidden); %initial context node values
 % disp('A call of nnFF')
 for ii = 1:numSequence
     %     disp('seq')

@@ -1,4 +1,4 @@
-function [] = DrawMaze(maze_files, maze_id)
+function [] = DrawMaze(maze_files, maze_goal, maze_id)
 % A function just for visualizing maze
 hold off
 maze = GenerateMaze(maze_files(maze_id).name); % Fetch the map data
@@ -10,4 +10,6 @@ end
 
 axis([ -11.5, 11.5, -11.5, 11.5]);
 axis equal; grid off; ax = gca; ax.XTick = -10:1:10; ax.YTick = -10:1:10;
+
+plot(maze_goal{maze_id}(:,1), maze_goal{maze_id}(:,2), '.', 'markerSize', 15);
 end

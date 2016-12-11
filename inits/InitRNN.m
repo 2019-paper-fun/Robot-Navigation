@@ -3,8 +3,9 @@
 % mode 2: Elman RNN
 nn.mode = 2;
 
+nn.option.subset_length = 100;
 nn.option.learningRate = 0.0005;
-nn.option.maxIter = 10000;
+nn.option.maxIter = 20000;
 if nn.mode == 1
     nn.option.numContext = 25; % Only used for Jordan-like RNN, Jordan type will determine # of context nodes by itself
     nn.option.numInput =  size(dataPer_list{1}{1},1)+nn.option.numContext;
@@ -12,6 +13,7 @@ if nn.mode == 1
     nn.option.netDim = [nn.option.numInput 25 25 nn.option.numOutput];
 else
     nn.option.numHidden = 25;
+    nn.option.numContext = nn.option.numHidden; % Just for placeholder
     nn.option.numInput =  size(dataPer_list{1}{1},1)+nn.option.numHidden;
     nn.option.numOutput = size(dataPer_list{1}{2},1);
     nn.option.netDim = [nn.option.numInput 25 nn.option.numHidden nn.option.numOutput];
