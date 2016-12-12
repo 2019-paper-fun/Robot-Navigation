@@ -131,7 +131,7 @@ xxxxxxxxxx
 %% Train the network using RNN
 
 % Load the dataset from a mat file
-load('data/path_data/backup_cshong/dataPer_list_onecycle2-1-置重.mat');
+load('data/path_data/dataPer_list.mat');
 
 % Transform the dataset so that laser nodes are not much greather than goal nodes
 for i = 1:length(dataPer_list)
@@ -162,13 +162,15 @@ save('data/nn_data/trained_RNN.mat', 'nn');
 %% Train the network using MLP
 
 % Load the dataset from a mat file
-load('data/path_data/bsk/dataPer_maze1.mat');
+load('data/path_data/dataPer_list.mat');
 
 % Transform the dataset so that laser nodes are not much greather than goal nodes
 for i = 1:length(dataPer_list)
     dataPer_list{i}{1}(1:7,:) = dataPer_list{i}{1}(1:7,:)/30; %Lasers [0 30] -> [0 2]
     dataPer_list{i}{1}(8,:) = dataPer_list{i}{1}(8,:)/(2*pi) + 0.5; %Goal angle [-pi pi] -> [0 1]
 end
+
+dataPer_list{i}{2} = 0.25 + 0.5*dataPer_list{i}{2}; %0,1 -> 0.25 0.75 for easy learning
 
 % Concatenate All Dataset - Only for MLP, not RNN
 dataPer = cell(1,2);
@@ -193,7 +195,7 @@ xlabel('Epochs');
 ylabel('MSE');
 
 % Save the network
-save('data/nn_data/bsk/MLP_mz1_dt100_ep10_01.mat', 'wIn', 'wHid', 'wOut', 'MSEav3', 'mlpParam');
+save('data/nn_data/MLP_res.mat', 'wIn', 'wHid', 'wOut', 'MSEav3', 'mlpParam');
 
 %% Load a trained RNN network if necessary
 load('data/nn_data/cshong_backup/trainedRNN_置重.mat');

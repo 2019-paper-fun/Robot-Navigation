@@ -23,7 +23,7 @@ for i = 1:epoch
     index = randperm(length(data{1}));       %random perm index
     MSE = 0;
     
-    for j = 1:length(data{1})
+    for j = 1:1300 %Only 1300 random samples per epoch
         r = index(j);
 
         % FORWARD PROPAGATION
@@ -90,7 +90,7 @@ for i = 1:epoch
 
     end
     
-    MSEav(i) = MSE/length(data{1});
+    MSEav(i) = MSE/1300; %Mean of 1300 samples
     
     disp('MSE: ')
     disp(MSEav(i))

@@ -1,7 +1,7 @@
 %initializing MLP
 
 %architecture and parameters    
-mlpParam  = struct('moment', 0.5 ,'alpha', 0.5, 'eta', 0.05, 'epoch', 100);
+mlpParam  = struct('moment', 0.5 ,'alpha', 0.5, 'eta', 0.05, 'epoch', 100000);
 mlpArch = struct('inputs', sensor_num + 2, 'hidden1', 25, 'hidden2', 25, 'outputs', 2);
 %weights init
 wIn1Init = -0.1 + (0.1+0.1)*rand(mlpArch.inputs+1,mlpArch.hidden1);

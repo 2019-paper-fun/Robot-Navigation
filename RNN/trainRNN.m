@@ -67,7 +67,6 @@ elseif nn.mode == 2 %Elman RNN
             for kk = 1:size(nodes,1)
                 result(kk,:) = nodes{kk,end}(1:2);
             end
-            
             MSE(ii) = MSE(ii) + sum((result(:)-oput(:)).^2)/size(oput,1);
         end
         MSE(ii) = MSE(ii)/length(dataset);
