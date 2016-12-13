@@ -13,19 +13,9 @@ nodes{1} = [input context]; %merge input and context channels
 
 for jj = 1:length(nn.option.netDim)-1 %Propagating through layers 
     temp = nodes{jj}*nn.layer{jj}.W+nn.layer{jj}.b; %Propagate to next layer
-    
-    %         if (jj ~= length(nn.option.netDim) - 1) %Except Last Layer
     nodes{jj+1} = feval(nn.option.activation, temp); %Activation Function
-    %         else
-    %             nodes{ii,jj+1} = temp; %For output layer there is no activation function
-    %         end
 end
 
-output = nodes{end}(1:end-nn.option.numContext); %Get the output node values
-context = nodes{end}(end-nn.option.numContext+1:end); %Get the context node values
-
-%     disp(nodes{ii,end})
-%     disp(context)
-%     pause
-
+output = nodes{end}; %Get the output node values
+context = nodes{end-1}(end-nn.option.numHidden+1:end); %Get the context node values
 end

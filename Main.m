@@ -54,9 +54,11 @@ loadMazeGoal;
 iterations = num_of_maze;
 
 % Load the dataset from a mat file
-load('data/path_dat/dataPer_list.mat');
-% dataPer_list = {};
-% maze_history = zeros(1,num_of_maze);
+% load('data/path_dat/dataPer_list.mat');
+
+% Create a new dataset
+dataPer_list = {};
+maze_history = zeros(1,num_of_maze);
 
 % Copy the original
 temp_list = dataPer_list;
@@ -70,12 +72,13 @@ end
 
 count = count + 1; % Increment the pointer for cell
 
-for ii=1:iterations
-    for j = 1:1
+for ii=1:iterations %mazes
+    for j = 1:3 %goals
         success = 0;
         while (success ~= 1) % Force the program to collect data until a successful path is made
             fprintf('Iteration %d: Trying to gather Data #%d\n', ii, count);
             close all;
+            
             %Initialize the robot
             InitRobot;
             
@@ -83,11 +86,10 @@ for ii=1:iterations
             clear maze
             
             maze_number = ii;
-            %             maze_number = rem(ii,num_of_maze) + 1; %randi(num_of_maze); % randomly select a map
-            
             maze = GenerateMaze(maze_files(maze_number).name);
             fprintf('Gather data in %s\n', maze_files(maze_number).name);
             
+            %use a designated goal position
             robot.goal(1) = mazeGoal{ii}(j,1);
             robot.goal(2) = mazeGoal{ii}(j,2);
             
@@ -100,7 +102,7 @@ for ii=1:iterations
             
             %Run the selected strategy
             run(strategies{mode});
-            
+
             if (goal)
                 disp('Goal Reached')
                 SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, strcat('data',num2str(count))); %Save the figure
@@ -124,6 +126,7 @@ dataPer_list = dataPer_list(1,1:count-1);
 save('data/path_data/dataPer_list.mat', 'dataPer_list', 'maze_history');
 
 %% Special Function to Save a Backup! %%
+
 xxxxxxxxxx
 save('data/path_data/dataPer_list_backup.mat', 'dataPer_list', 'maze_history');
 xxxxxxxxxx
@@ -198,10 +201,8 @@ ylabel('MSE');
 save('data/nn_data/trained_MLP.mat', 'wIn', 'wHid', 'wOut', 'MSEav3', 'mlpParam');
 
 %% Load a trained RNN network if necessary
-load('data/nn_data/trained_RNN.mat');
 
-%% Load a trained MLP network if necessary
-load('data/nn_data/bsk/MLP_mz1_dt100_ep10_030.mat');
+load('data/nn_data/trained_RNN.mat');
 
 %% Test the trained network using RNN
 
@@ -227,14 +228,15 @@ for iter = 1:length(mazeGoal)
             
             check = 0;
             while(~collision && ~goal)
+                % Fetch the sensor readings
                 vect = [laserHist(1:end-1,end)' gtHist(:,end)'];
+                
+                % Scale the readings to [0 1]
                 vect(1:7) = vect(1:7)/30;
                 vect(8) = vect(8)/(2*pi) + 0.5;
-                if nn.mode == 1
-                    [vOut, context] = nnSingleFF(vect, context, nn);
-                elseif nn.mode == 2
-                    [vOut, context] = nnSingleFF_Elman(vect, context, nn);
-                end
+                
+                % Put into RNN
+                [vOut, context] = nnSingleFF(vect, context, nn);
                 v = round(vOut');
                 
                 if sum(v) == 0
@@ -255,7 +257,12 @@ for iter = 1:length(mazeGoal)
             else
                 disp('collision!')
             end
-            SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, sprintf('Map%d-Goal%d-Iter%d', iter, it, ii));
+            
+            %Save the resulting figure
+            SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, sprintf('RNN-Map%d_Goal%d_Iter%d', iter, it, ii));
+        
+            %Simulation of the route
+            %Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
         end
     end
 end
@@ -263,12 +270,12 @@ end
 fprintf('Success Counts on %d Trials\n', iterations);
 disp(goalReached)
 
-%Simulation of the route
-%Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
-save('data/nn_data/to0005_50_25000.mat', 'goalReached');
 
-%% Save the simulation result if you want
-SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, 'result');
+save('data/nn_data/RNN_goal_trials.mat', 'goalReached');
+
+%% Load a trained MLP network if necessary
+
+load('data/nn_data/trained_MLP.mat');
 
 %% Test the trained network using MLP
 
@@ -291,10 +298,14 @@ for iter = 1:length(mazeGoal)
             HistoryUpdate;
             
             while(~collision && ~goal)
+                % Fetch the readings
                 vect = [laserHist(1:end-1,end)' gtHist(:,end)'];
+                
+                % Scale the readings to [0 1]
                 vect(1:7) = vect(1:7)/30;
                 vect(8) = vect(8)/(2*pi) + 0.5;
                 
+                % Put into MLP
                 vOut = MlpRun(vect', wIn, wHid, wOut, mlpParam);
                 v = round(vOut);
                 
@@ -316,14 +327,17 @@ for iter = 1:length(mazeGoal)
             else
                 disp('collision!')
             end
-            SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, sprintf('MLP-Map%d-Goal%d-Iter%d', iter, it, ii));
+            
+            %Save the resulting figure
+            SaveFigure(poseHist, laserHist, gtHist, maze, robot, collision, goal, 1, sprintf('MLP-Map%d_Goal%d_Iter%d', iter, it, ii));
+        
+            %Simulation of the route
+            %Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);  
         end
     end
 end
 
 fprintf('Success Counts on %d Trials\n', iterations);
 disp(goalReached)
-%% Run a simulation using data obtained from a NN
 
-%Simulation of the route
-Simulation(poseHist, laserHist, gtHist, maze, robot, collision, goal, Ts, 1);
+save('data/nn_data/MLP_goal_trials.mat', 'goalReached');

@@ -1,9 +1,9 @@
 function [robot] = GenerateRandGoal( robot, maze )
-%GenerateStartNGoal - Generate the initial point of robot and goal point of the maze
+%GenerateStartNGoal - Generate a random goal at the end of maze
 %   robot: robot
 %   maze: maze
 
-% find the random goal position which is on the line of two points (a,b), (c,d)
+% find a random goal position which is on the line of two points (a,b), (c,d)
 wall_detector = -pi+0.01:2*pi/360:pi;
 ok = 0;
 while (~ok) % try to find a goal position that is reachable

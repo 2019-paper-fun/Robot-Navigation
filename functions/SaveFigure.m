@@ -1,13 +1,13 @@
 function [] = SaveFigure(pose, laserHist, gtHist, maze, robot, collision, goal, plotRoute, path)
-%SIMULATION Real-time simulation plotting
+%Function for saving a simulation result figure
 %   pose - history of all poses of the robot
 %   laserHist - all laser measurements
-%   gtHist - ?
+%   gtHist - goal angle + is_goal_visible
 %   maze - maze drawing coordinates
 %   robot - robot structure
 %   collision - collision flag
 %   plotRoute - set 1 to plot the route of the robot
-%   path - to where this figure is saved
+%   path - filename
 
 savepath = strcat('data/path_data/figures/', path, '.png');
 

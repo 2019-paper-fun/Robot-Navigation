@@ -23,74 +23,59 @@ for i = 1:epoch
     index = randperm(length(data{1}));       %random perm index
     MSE = 0;
     
-    for j = 1:650
+    for j = 1:650 %How many random samples / epoch ?
         r = index(j);
 
         % FORWARD PROPAGATION
-
             x = [1; data{1}(:,r)];
-
+            
             % hidden layer 1
-
             locFieldHid1 = wIn'*x;
             yHidden1 = sig(locFieldHid1,alpha);  
             
             % hidden layer 2
-
             locFieldHid2 = wHid'*[1; yHidden1];
             yHidden2 = sig(locFieldHid2,alpha); 
 
             % output layer
-
             locFieldOut = wOut'*[1; yHidden2];
             yOut = sig(locFieldOut,alpha);      
 
             % deriving error
-
             d = data{2}(:,r);
-
             e = d - yOut;
-            
             MSE = MSE + e'*e;
 
         % BACKWARD PROPAGATION
-        
             %gradient for output layer
-
             locGradOut = e.*sigDer(locFieldOut,alpha);
 
             %gradients for hidden layer 2
-
             locGradHid2 = sigDer(locFieldHid2,alpha).*(wOut(2:end,:)*locGradOut);
             
             %gradients for hidden layer 1
-
             locGradHid1 = sigDer(locFieldHid1,alpha).*(wHid(2:end,:)*locGradHid2);
 
             %output weight update out
-
             wDelta = wOut - wOutPrev;
             wOutPrev = wOut;
 
             wOut(2:end,:) = wOut(2:end,:) + moment*wDelta(2:end,:) + eta*[yHidden2]*locGradOut';
             
             %output weight update hid 2
-
             wDelta = wHid - wHidPrev;
             wHidPrev = wHid;
 
             wHid(2:end,:) = wHid(2:end,:) + moment*wDelta(2:end,:) + eta*[yHidden1]*locGradHid2';
 
             %input weight update hid 1
-
             wDelta = wIn - wInPrev;
             wInPrev = wIn;
 
             wIn = wIn + moment*wDelta + eta*x*locGradHid1';
-
     end
     
-    MSEav(i) = MSE/650;
+    MSEav(i) = MSE/650; % Divide by number of samples / epoch to get the average
     
     disp('MSE: ')
     disp(MSEav(i))

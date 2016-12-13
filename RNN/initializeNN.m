@@ -1,5 +1,5 @@
 function layer = initializeNN(netDim)
-%% initializeNN initialize neural network
+%% initializeNN - Initialize weights and biases of network
 
 layer = cell(numel(netDim)-1,1); 
 

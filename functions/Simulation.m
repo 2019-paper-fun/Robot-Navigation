@@ -2,12 +2,12 @@ function [] = Simulation(pose, laserHist, gtHist, maze, robot, collision, goal, 
 %SIMULATION Real-time simulation plotting
 %   pose - history of all poses of the robot
 %   laserHist - all laser measurements
-%   gtHist - ?
+%   gtHist - goal angle + is_goal_visible
 %   maze - maze drawing coordinates
 %   robot - robot structure
 %   collision - collision flag
-%   plotRoute - set 1 to plot the route of the robot
 %   Ts - sampling time
+%   plotRoute - set 1 to plot the route of the robot
 
 if nargin < 7 % what is nargin? Number of Arguments in Input - default parameter similar to argc in C
     plotRoute = 0;
