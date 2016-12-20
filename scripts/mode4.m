@@ -3,7 +3,7 @@ b = robot.size(2);  % robot width
 [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 1], maze, Ts); % go front at the initial pose
 HistoryUpdate;
 
-scale = 0.1; %scales the sensitivity of obstacle avoidance when goal is 'not visible'
+scale1 = 0.1; %scales the sensitivity of obstacle avoidance when goal is 'not visible'
 scale2 = 0.1; %scales the sensitivity of obstacle avoidance when goal is 'visible'
 
 % long program of else-ifs
@@ -12,7 +12,7 @@ while(~collision && ~goal)
     yPose = robot.pose(2)+((a-b)/2+b/2)*sin(robot.pose(3));
     
     if(gtHist(2,end)==0) % goal is invisible
-        if laserHist(4, end) < 2 + scale
+        if laserHist(4, end) < 2 + scale1
             if(laserHist(7,end) + laserHist(6,end) + laserHist(5,end) < laserHist(3,end) + laserHist(2,end) + laserHist(1,end))
                 [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
                 HistoryUpdate;
@@ -20,22 +20,22 @@ while(~collision && ~goal)
                 [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
                 HistoryUpdate;
             end
-        elseif laserHist(5,end)< 2.6 + scale
+        elseif laserHist(5,end)< 2.6 + scale1
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
-        elseif laserHist(3,end)< 2.6 + scale
+        elseif laserHist(3,end)< 2.6 + scale1
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
-        elseif laserHist(6,end)< 2.3 + scale
+        elseif laserHist(6,end)< 2.3 + scale1
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
-        elseif laserHist(2,end)< 2.3 + scale
+        elseif laserHist(2,end)< 2.3 + scale1
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
-        elseif laserHist(7,end)< 2.1 + scale
+        elseif laserHist(7,end)< 2.1 + scale1
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [1; 0], maze, Ts);
             HistoryUpdate;
-        elseif laserHist(1,end)< 2.1 + scale
+        elseif laserHist(1,end)< 2.1 + scale1
             [hist, lHist, vel, gHist, collision, goal] = Drive(robot, 0.1, [0; 1], maze, Ts);
             HistoryUpdate;
         else
