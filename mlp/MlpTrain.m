@@ -1,8 +1,4 @@
 function [wIn, wHid, wOut, MSEav] = MlpTrain(data, wIn, wHid, wOut, mlpParam)
-%MlpTrain Trains multilayered perceptron
-%   Inputs: x,y - vector's foothold, alpha - vectors angle from OX
-%
-%   [A,B] = V2L(x,y,alpha)
 
 epoch = mlpParam.epoch;
 eta = mlpParam.eta;

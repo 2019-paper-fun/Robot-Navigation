@@ -11,16 +11,12 @@
 % For changing test maze go to 'running with perceptron for different route'
 % subsection and change maze name .
 
-%% Initialization
+%% Subsection I: Initialization
 clc;
 clear all;
 
 % Timestep
 Ts = 0.01;
-
-% Select a data collection method (1 = static route, 2 = tunnel drive, 3 =
-% wall follow, 4 = mode4)
-mode = 4;
 
 % Add paths
 addpath('functions/');
@@ -29,27 +25,25 @@ addpath(genpath('data'));
 addpath('inits/');
 addpath('scripts/');
 addpath(genpath('RNN/')); % RNN path
-addpath('mlp/'); % mlp path
+addpath('MLP/'); % MLP path
 
 %Define strategies
-strategies = {'StaticRoute' 'TunnelDrive' 'WallFollow' 'mode4'};
+strategies = {'StaticRoute' 'TunnelDrive' 'WallFollow' 'Nav2Goal'};
 %StaticRoute: driving static route
 %TunnelDrive: simple algorithm - tunnel driving
 %WallFollow: simple algorithm - following LEFT wall
-%mode4: what about making a good name?
+%Nav2Goal: navigates toward the goal while avoiding obstacles
 
-%Number of sensors on robot
-sensor_num = 7;
-
-%Sensor angle for leftmost sensor x (rightmost sensor's angle will be -x, others will be evenly spread between two sensors)
-sensor_ang = pi/2;
+% Select a data collection method (1 = static route, 2 = tunnel drive, 3 =
+% wall follow, 4 = mode4)
+mode = 4;
 
 %Fetch the maze files
 maze_files = dir('mazeLib/*.xlsx');
 num_of_maze=size(maze_files,1);
 loadMazeGoal;
 
-%% Iterate through maze files to get multiple dataset
+%% Subsection II: Iterate through maze files to get multiple dataset
 % How many iterations per run?
 iterations = num_of_maze;
 
@@ -125,13 +119,13 @@ dataPer_list = dataPer_list(1,1:count-1);
 % Save the dataset as a mat file
 save('data/path_data/dataPer_list.mat', 'dataPer_list', 'maze_history');
 
-%% Special Function to Save a Backup! %%
+%% Subsection Extra: Special Function to Save a Backup! %%
 
 xxxxxxxxxx
 save('data/path_data/dataPer_list_backup.mat', 'dataPer_list', 'maze_history');
 xxxxxxxxxx
 
-%% Train the network using RNN
+%% Subsection III - I: Train the network using RNN
 
 % Load the dataset from a mat file
 load('data/path_data/dataPer_list.mat');
@@ -162,7 +156,7 @@ ylabel('MSE');
 % Save the network
 save('data/nn_data/trained_RNN.mat', 'nn', 'MSE');
 
-%% Train the network using MLP
+%% Subsection III - II: Train the network using MLP
 
 % Load the dataset from a mat file
 load('data/path_data/dataPer_list.mat');
@@ -200,11 +194,9 @@ ylabel('MSE');
 % Save the network
 save('data/nn_data/trained_MLP.mat', 'wIn', 'wHid', 'wOut', 'MSEav3', 'mlpParam');
 
-%% Load a trained RNN network if necessary
+%% Subsection IV - I: Test the trained network using RNN
 
 load('data/nn_data/trained_RNN.mat');
-
-%% Test the trained network using RNN
 
 goalReached = zeros(3,length(mazeGoal)); % The number of time the robot reached to the goal
 iterations = 10; % The number of time to test
@@ -273,11 +265,9 @@ disp(goalReached)
 
 save('data/nn_data/RNN_goal_trials.mat', 'goalReached');
 
-%% Load a trained MLP network if necessary
+%% Subsection IV - II: Test the trained network using MLP
 
 load('data/nn_data/trained_MLP.mat');
-
-%% Test the trained network using MLP
 
 goalReached = zeros(3,length(mazeGoal)); % The number of time the robot reached to the goal
 iterations = 10; % The number of time to test
