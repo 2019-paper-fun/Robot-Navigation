@@ -15,11 +15,13 @@ The implementation of neural network-based robot navigation is done by improving
 - **Solution Proposed**
     - Use the RNN and MLP for autonomous navigation robot to have better generalization on environment, obstacles and goal position.
 
-- **Contribution**
+- **Experimental Result**
     - Testing with trained map and trained goal, the performances of the two networks varied on each maze.
     - Testing with trained map and a new goal, RNN-based robot could navigate better than MLP-based robot.
     - Testing with a new map and a new goal, RNN-based robot could navigate even when the robot was in totally new environment.
-    - Since the path data is time-series data, the navigation problem could better be solved by RNN.
+    
+- **Contribution**
+    - RNN-based robot showed overall better performance than MLP, since RNN could handle arbitrary temporal dynamics.
     - RNN has better generalization ability for new mazes and goals than MLP does.
 
 ## Installation
@@ -118,15 +120,14 @@ The functions are for training and testing the multilayer perceptron. Structural
 The functions are for training and testing the Elman-type recurrent neural   network.
 Structural changes should be made in this folder.
 
--	activation folder – Folder containing activation functions
+- activation folder – Folder containing activation functions
   -	dSigmoid.m – Derivative of sigmoid function
   -	sigmoid.m – Sigmoid function
-
--	BPTT.m – Backpropagation through time function
--	FFTT.m – Forward propagation function
--	initializeNN.m – Initializes the weights and biases of all layers
--	nnSingleFF.m – Push a sample into the trained RNN to get the output
--	trainRNN.m – Train the Elman-type RNN using the dataset
+- BPTT.m – Backpropagation through time function
+- FFTT.m – Forward propagation function
+- initializeNN.m – Initializes the weights and biases of all layers
+- nnSingleFF.m – Push a sample into the trained RNN to get the output
+- trainRNN.m – Train the Elman-type RNN using the dataset
 
 ## Files in 'scripts' folder
 Four MATLAB scripts are for the automatic robot navigation used for collecting the training dataset. Based on the robot laser sensor configuration, these scripts must be modified accordingly.
