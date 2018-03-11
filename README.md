@@ -6,7 +6,9 @@ The implementation of neural network-based robot navigation is done by improving
 
 - **Robot navigation simulator**
 
-![Example](/images/robot_navigation.png)
+![Example](/images/robot_navigation.png | width=100)
+
+<p align="center"><img src="/images/robot_navigation.png" height="400" width="350"></p>
 
 ## Research Summary
 - **Problem Statement**
@@ -149,7 +151,7 @@ Four MATLAB scripts are for the automatic robot navigation used for collecting t
 -	mazeTemplate – The folder containing an empty maze template. You can draw a new maze using the maze file in the folder.
 
 ## Author
-Byung Soo Ko / kobiso62@gmail.com
-Chansol Hong / cshong@rit.kaist.ac.kr
-Oh Chul Kwon / zelot11@kaist.ac.kr
+- Byung Soo Ko / kobiso62@gmail.com
+- Chansol Hong / cshong@rit.kaist.ac.kr
+- Oh Chul Kwon / zelot11@kaist.ac.kr
  
