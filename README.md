@@ -4,9 +4,14 @@ Robot Navigation
 This is an implementation of a paper ["Neural Network-based Autonomous Navigation for a Homecare Mobile Robot"](http://ieeexplore.ieee.org/document/7881744/) which was presented in BigData4Healthcare 2017 (workshop in IEEE BigComp 2017).
 The implementation of neural network-based robot navigation is done by improving the initial code of Michal Kramarczyk.
 
-- **Robot navigation simulator**
+- [**Presentation material in BigData4Healthcare 2017**](https://www.slideshare.net/ByungSooKo1/neural-network-based-autonomous-navigation-for-a-homecare-mobile-robot)
 
-![Example](/images/robot_navigation.png | width=100)
+- **Test videos of robot navigation**
+    - [Test with the default goal position](https://www.youtube.com/watch?v=ElCze9OxcBg)
+    - [Test with other goal position](https://www.youtube.com/watch?v=gkB8bYLLEd0)
+    - [Test with new maze](https://www.youtube.com/watch?v=pV5DSQr-KX4)
+
+- **Robot navigation simulator**
 
 <p align="center"><img src="/images/robot_navigation.png" height="400" width="350"></p>
 
