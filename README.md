@@ -4,6 +4,10 @@ Robot Navigation
 This is an implementation of a paper ["Neural Network-based Autonomous Navigation for a Homecare Mobile Robot"](http://ieeexplore.ieee.org/document/7881744/) which was presented in BigData4Healthcare 2017 (workshop in IEEE BigComp 2017).
 The implementation of neural network-based robot navigation is done by improving the initial code of Michal Kramarczyk.
 
+- **Robot navigation simulator**
+
+![Example](/images/robot_navigation.png)
+
 ## Research Summary
 - **Problem Statement**
     - There are challenges of autonomous navigation robot such as frequent changes of environment, obstacles and goal position.
@@ -144,5 +148,8 @@ Four MATLAB scripts are for the automatic robot navigation used for collecting t
 -	mazeLib – The folder for maze files used in training/testing. By default all maze files in this folder are used for path data collection.
 -	mazeTemplate – The folder containing an empty maze template. You can draw a new maze using the maze file in the folder.
 
-
+## Author
+Byung Soo Ko / kobiso62@gmail.com
+Chansol Hong / cshong@rit.kaist.ac.kr
+Oh Chul Kwon / zelot11@kaist.ac.kr
  
